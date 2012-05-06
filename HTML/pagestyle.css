@@ -1,0 +1,72 @@
+.titles {
+	letter-spacing:5px;
+	font-variant:small-caps;
+	font-size:20pt;
+	/* text-align:center; */
+}
+
+.sub-titles {
+	letter-spacing:4px;
+	font-variant:small-caps;
+	font-size:17pt;
+	/* text-align:center; */
+}
+
+.sec-titles {
+	letter-spacing:3px;
+	font-variant:small-caps;
+	font-size:14pt;
+	/* text-align:center; */
+}
+
+.body a:link {
+	color: gray;
+	text-decoration: none;
+	font-variant: small-caps;
+	font-size: 10pt;
+}
+
+.body a:visited {
+	color: gray;
+	text-decoration: none;
+	font-variant: small-caps;
+	font-size: 10pt;
+}
+
+.body a:hover {
+	color: silver;
+	text-decoration: underline;
+	font-variant: small-caps;
+	font-size: 10pt;
+}
+
+.body a:active {
+	color: silver;
+	text-decoration: underline;
+	font-variant: small-caps;
+	font-size: 10pt;	
+}
+
+.body p {
+	text-indent: 15px;
+	color: black;
+	text-size: 14pt;
+}
+
+.date {
+	color: gray;
+	font-size: 8pt;
+}
+
+.extracommand {
+	color: red;
+}
+
+table {
+	border: 2px solid grey;
+}
+
+td,th {
+	border: 1px solid silver;
+	vertical-align: top;
+}

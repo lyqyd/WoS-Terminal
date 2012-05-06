@@ -1,0 +1,19 @@
+/* Layout.css */
+/* Used to arrange elements on the page. */
+
+#menu {
+	position: absolute;
+	top: 25px;
+	left: 50px;
+	width: 129;
+	height: 129;
+}
+
+#content {
+	position:absolute;
+	top:25px;
+	right:50px;
+	left:179px;
+	bottom:25px;
+	padding-left: 5px;
+}

@@ -1,0 +1,19 @@
+;List of midis and sound files. Sxxx for sound effects, Mxxx for midi files.
+;Also an ACL list, confusingly enough.  ACL entries' row ids are soul IDs and the first column dictates the Terminal permissions level, which is a number -1 to 5, -1 being banned completely and 5 being total access.
+
+Soul 2044, "5", 1
+52273CE3, "5", 1
+
+;Don't change this chunk:
+s,		"spell"
+spell,		"spell"
+i,		"item"
+item,		"item"
+m,		"monster"
+monster,	"monster"
+t,		"trophy"
+trophy,		"trophy"
+
+;Midis and Sounds start here:
+
+M1, "Bobgeorge", "bob\george"

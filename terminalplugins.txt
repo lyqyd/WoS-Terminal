@@ -1,0 +1,48 @@
+;Terminal plugins.
+;
+;#include terminal plugins here:
+
+
+
+;A guide to writing terminal plugins
+;
+;1. Plugin Headers
+;
+;A typical plugin header will look like this:
+;
+;@terminalterminalmenuregister
+;	SET pluginname, "terminalmenu"
+;	SET optionsarray, 1
+;	SET optionsarray-1, "4, tmenu, terminaltmenu"
+;	SET callbacksarray, 1
+;	SET callbacksarray-1, "0, terminaltmenulockreset"
+;	STRCMP "#<arg0>", "unregister"
+;	IF= @terminalvspluginunregister
+;	CALL 2240@terminalregisterplugin #<pluginname>, optionsarray, callbacksarray
+;	GOTO @terminalterminalmenuafter
+;
+;@terminalterminalmenuunregister
+;	CALL 2240@terminalunregisterplugin #<pluginname>, optionsarray, callbacksarray
+;	RETURN 0
+;
+;Headers start as the first executable line in the plugin file, and the last executable line (in this example) would be @terminalterminalmenuafter (as seen in the GOTO after the register call).  This bit of script tells Terminal the extra options that can be typed, as well as any "callbacks" to run just before Terminal passes execution to the rest of the scene.
+;
+;In this specific example, we see that the plugin name is "terminalmenu", which is relatively descriptive, but concise.  This header happens to be from the terminal menu plugin.  The next line, "SET optionsarray, 1" sets the number of typable options this plugin adds to terminal.  The following line gives the permission level, typable command, and line label for the option.  Additional options would be in the same format in cookies named "optionsarray-2", "optionsarray-3", etc.  Callbacks follow much the same procedure.  The only difference is that there is no typable command; just the permission level and the line label are needed here.  Every callback for the player's permission level and all permission levels under him will be executed every time the scene loads, after Terminal has finished its initialization and before execution passes to the rest of the scene.
+;
+;Then we test to see if we are calling the registration code in order to unregister the plugin (CALL @terminalterminalmenuregister unregister).  If so, we call the unregistration function instead of the registration function.  Then the plugin either passes execution to the next plugin (or, if it is the last plugin, back to Terminal), or returns to whatever code called the unregistration function.
+;
+;2. Options and Callbacks
+;
+;Options and callbacks are somewhat similar in nature, in that they both are called from Terminal.  Options are called based on user input and permission level, while callbacks are called based solely on permission level, but only once per scene load.  Both options and callbacks should end with a RETURN, not an END.  This is especially important for callbacks, as other callbacks (and the rest of the scene!) wouldn't be able to be executed after a callback ending with an END.  Options not ending with a RETURN are not the best idea because it can mess with the Well of Souls CALL stack (potential for buffer overflow due to assymetric CALLs, for the technically-minded), so you wouldn't want a user to do that a lot of times in one scene.
+;
+;3. Hooks
+;
+;A plugin may register a "hook" to enable a different default behavior when right-clicking Terminal.  For instance, the terminal menu plugin allows the user to choose to only use the menu system by registering the "hook" so that instead of Terminal going to the usual ASK prompt, it goes to the menu system instead.
+;
+;Hooks are not called.  Terminal simply uses a GOTO to pass execution to whatever line label is registered for the hook.  If you want to use an option that normally ends with a RETURN, simply put an END command after the return.  When being used normally, it will return to whatever called it, and when used with the hook will simply end the scene when finished.
+;
+;To register a hook, call @terminalregisterhook with the line label you want the right-click to go to as the first argument (It is highly advisable to do this only from an explicit user action, and to include a way to unregister the hook from whatever you bind the right-click to with the hook), and call @terminalunregister hook with the same line label to unregister it.
+;
+;4. Notes
+;
+;It is generally inadvisable to modify any of the Terminal cookies directly.

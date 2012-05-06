@@ -1,0 +1,846 @@
+
+;default command set 1.4
+
+	SET dependencycheck, 0
+	CALL @checkversion string, 1.4
+	ADD dependencycheck, #<arg0>
+	COMPARE #<dependencycheck>, 1
+	IF< @defaultcommandafter
+	ADD functionlist, 1
+	SET functionlist-name-#<functionlist>, "defaultcommand"
+	SET functionlist-version-#<functionlist>, "1.3"
+	GOTO @defaultcommandafter
+
+@splitcommand
+	SET commandstring, #<arg0>
+	SET_SUBSTR comstrtest, 0, 1, #<commandstring>
+	;Take first character of command string and use it to figure out if we're looking at a legitimate command.
+	GOTO @command-#<comstrtest>
+	RETURN null
+	END
+@command-a
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "actor"
+	IF= @command-actor
+	SET_SUBSTR comstrtest, 0, 3, #<commandstring>
+	STRCMP #<comstrtest>, "add"
+	IF= @command-add
+	STRCMP #<comstrtest>, "and"
+	IF= @command-and
+	STRCMP #<comstrtest>, "ask"
+	IF= @command-ask
+	SET_SUBSTR comstrtest, 0, 2, #<commandstring>
+	STRCMP #<comstrtest>, "at"
+	IF= @command-at
+	SET_SUBSTR comstrtest, 0, 1, #<commandstring>
+	STRCMP #<comstrtest>, "@"
+	IF= @command-at
+	RETURN null
+	END
+@command-b
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "bkgnd"
+	IF= @command-bkgnd
+	RETURN null
+	END
+@command-c
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "call"
+	IF= @command-call
+	SET_SUBSTR comstrtest, 0, 7, #<commandstring>
+	STRCMP #<comstrtest>, "compare"
+	IF= @command-compare
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "color"
+	IF= @command-color
+	SET_SUBSTR comstrtest, 0, 9, #<commandstring>
+	STRCMP #<comstrtest>, "countdown"
+	IF= @command-countdown
+	RETURN null
+	END
+@command-d
+	SET_SUBSTR comstrtest, 0, 6, #<commandstring>
+	STRCMP #<comstrtest>, "dialog"
+	IF= @command-dialog
+	SET_SUBSTR comstrtest, 0, 3, #<commandstring>
+	STRCMP #<comstrtest>, "div"
+	IF= @command-div
+	RETURN null
+	END
+@command-f
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "face"
+	IF= @command-face
+	SET_SUBSTR comstrtest, 0, 6, #<commandstring>
+	STRCMP #<comstrtest>, "fight2"
+	IF= @command-fight2
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "fight"
+	IF= @command-fight
+	STRCMP #<comstrtest>, "flags"
+	IF= @command-flags
+	STRCMP #<comstrtest>, "f_add"
+	IF= @command-f_add
+	STRCMP #<comstrtest>, "f_div"
+	IF= @command-f_div
+	STRCMP #<comstrtest>, "f_mod"
+	IF= @command-f_mod
+	STRCMP #<comstrtest>, "f_mul"
+	IF= @command-f_mul
+	STRCMP #<comstrtest>, "f_sub"
+	IF= @command-f_sub
+	SET_SUBSTR comstrtest, 0, 9, #<commandstring>
+	STRCMP #<comstrtest>, "f_compare"
+	IF= @command-f_compare
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "find"
+	IF= @command-find
+	SET_SUBSTR comstrtest, 0, 2, #<commandstring>
+	STRCMP #<comstrtest>, "fx"
+	IF= @command-fx
+	RETURN null
+	END
+@command-g
+	SET_SUBSTR comstrtest, 0, 14, #<commandstring>
+	STRCMP #<comstrtest>, "get_server_var"
+	IF= @command-get_server_var
+	SET_SUBSTR comstrtest, 0, 9, #<commandstring>
+	STRCMP #<comstrtest>, "goto exit"
+	IF= @command-goto_exit
+	STRCMP #<comstrtest>, "goto_exit"
+	IF= @command-goto_exit
+	STRCMP #<comstrtest>, "goto link"
+	IF= @command-gotolink
+	STRCMP #<comstrtest>, "goto_link"
+	IF= @command-goto_link
+	SET_SUBSTR comstrtest, 0, 10, #<commandstring>
+	STRCMP #<comstrtest>, "goto scene"
+	IF= @command-gotoscene
+	STRCMP #<comstrtest>, "goto_scene"
+	IF= @command-goto_scene
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "game"
+	IF= @command-game
+	STRCMP #<comstrtest>, "give"
+	IF= @command-give
+	STRCMP #<comstrtest>, "goto"
+	IF= @command-goto
+	RETURN null
+	END
+@command-h
+	SET_SUBSTR comstrtest, 0, 9, #<commandstring>
+	STRCMP #<comstrtest>, "host_give"
+	IF= @command-host_give
+	STRCMP #<comstrtest>, "host give"
+	IF= @command-hostgive
+	STRCMP #<comstrtest>, "host_take"
+	IF= @command-host_take
+	STRCMP #<comstrtest>, "host take"
+	IF= @command-hosttake
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "html"
+	IF= @command-html
+	RETURN null
+	END
+@command-i
+	SET_SUBSTR comstrtest, 0, 2, #<commandstring>
+	STRCMP #<comstrtest>, "if"
+	IF= @command-if
+	RETURN null
+	END
+@command-l
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "lock"
+	IF= @command-lock
+	RETURN null
+	END
+@command-m
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "music"
+	IF= @command-music
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "move"
+	IF= @command-move
+	SET_SUBSTR comstrtest, 0, 3, #<commandstring>
+	STRCMP #<comstrtest>, "mod"
+	IF= @command-mod
+	STRCMP #<comstrtest>, "mul"
+	IF= @command-mul
+	RETURN null
+	END
+@command-n
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "nand"
+	IF= @command-nand
+	SET_SUBSTR comstrtest, 0, 3, #<commandstring>
+	STRCMP #<comstrtest>, "nor"
+	IF= @command-nor
+	STRCMP #<comstrtest>, "not"
+	IF= @command-not
+	SET_SUBSTR comstrtest, 0, 9, #<commandstring>
+	STRCMP #<comstrtest>, "nth_token"
+	IF= @command-nth_token
+	RETURN null
+	END
+@command-o
+	SET_SUBSTR comstrtest, 0, 6, #<commandstring>
+	STRCMP #<comstrtest>, "offer2"
+	IF= @command-offer2
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "offer"
+	IF= @command-offer
+	SET_SUBSTR comstrtest, 0, 2, #<commandstring>
+	STRCMP #<comstrtest>, "or"
+	IF= @command-or
+	RETURN null
+	END
+@command-p
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "party"
+	IF= @command-party
+	SET_SUBSTR comstrtest, 0, 10, #<commandstring>
+	STRCMP #<comstrtest>, "party_give"
+	IF= @command-party_give
+	STRCMP #<comstrtest>, "party give"
+	IF= @command-partygive
+	STRCMP #<comstrtest>, "party_take"
+	IF= @command-party_take
+	STRCMP #<comstrtest>, "party take"
+	IF= @command-partytake
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "pose"
+	IF= @command-pose
+	RETURN null
+	END
+@command-r
+	SET_SUBSTR comstrtest, 0, 6, #<commandstring>
+	STRCMP #<comstrtest>, "return"
+	IF= @command-return
+	RETURN null
+	END
+@command-s
+	SET_SUBSTR comstrtest, 0, 14, #<commandstring>
+	STRCMP #<comstrtest>, "set_server_var"
+	IF= @command-set_server_var
+	SET_SUBSTR comstrtest, 0, 10, #<commandstring>
+	STRCMP #<comstrtest>, "set_substr"
+	IF= @command-set_substr
+	SET_SUBSTR comstrtest, 0, 3, #<commandstring>
+	STRCMP #<comstrtest>, "set"
+	IF= @command-set
+	STRCMP #<comstrtest>, "sub"
+	IF= @command-sub
+	STRCMP #<comstrtest>, "sel"
+	IF= @command-sel
+	SET_SUBSTR comstrtest, 0, 6, #<commandstring>
+	STRCMP #<comstrtest>, "strcmp"
+	IF= @command-strcmp
+	STRCMP #<comstrtest>, "strstr"
+	IF= @command-strstr
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "sort"
+	IF= @command-sort
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "sound"
+	IF= @command-sound
+	RETURN null
+	END
+@command-t
+	SET_SUBSTR comstrtest, 0, 5, #<commandstring>
+	STRCMP #<comstrtest>, "take"
+	IF= @command-take
+	STRCMP #<comstrtest>, "theme"
+	IF= @command-theme
+	RETURN null
+	END
+@command-v
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "view"
+	IF= @command-view
+	RETURN null
+	END
+@command-w
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "wait"
+	IF= @command-wait
+	SET_SUBSTR comstrtest, 0, 7, #<commandstring>
+	STRCMP #<comstrtest>, "weather"
+	IF= @command-weather
+	RETURN null
+	END
+@command-x
+	SET_SUBSTR comstrtest, 0, 4, #<commandstring>
+	STRCMP #<comstrtest>, "xnor"
+	IF= @command-xnor
+	SET_SUBSTR comstrtest, 0, 3, #<commandstring>
+	STRCMP #<comstrtest>, "xor"
+	IF= @command-xor
+	RETURN null
+	END
+
+	;These chunks separate the arguments of the commands and return them.
+
+@command-actor
+@command-call
+@command-fight
+@command-fight2
+@command-offer
+@command-offer2
+	SET_LEN comlen, #<comstrtest>
+	ADD comlen, 1
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "#<comlen>"
+	SET_SUBSTR string, #<comlen>, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>
+	END
+
+@command-add
+@command-and
+@command-ask
+@command-div
+@command-mod
+@command-mul
+@command-nor
+@command-set
+@command-sub
+@command-xor
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "4"
+	SET_SUBSTR string, 4, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-at
+@command-fx
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "3"
+	SET_SUBSTR string, 3, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+
+@command-bkgnd
+@command-color
+@command-eject
+@command-flags
+@command-music
+@command-party
+@command-sound
+@command-theme
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "6"
+	SET_SUBSTR string, 6, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+
+@command-compare
+@command-set_len
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "8"
+	SET_SUBSTR string, 8, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-hostgive
+	SET comstrtest, "host_give"
+	GOTO @command-host_give
+@command-hosttake
+	SET comstrtest, "host_take"
+	GOTO @command-host_take
+
+@command-countdown
+@command-host_give
+@command-host_take
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "10"
+	SET_SUBSTR string, 10, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+	END
+
+@command-dialog
+@command-strcmp
+@command-strstr
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "7"
+	SET_SUBSTR string, 7, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-f_add
+@command-f_div
+@command-f_mod
+@command-f_mul
+@command-f_sub
+@command-timer
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "6"
+	SET_SUBSTR string, 6, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-gotolink
+	SET comstrtest, "goto_link"
+	GOTO @command-goto_link
+	
+@command-f_compare
+@command-goto_link
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "10"
+	SET_SUBSTR string, 10, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-face
+@command-nand
+@command-xnor
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "5"
+	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-game
+@command-give
+@command-goto
+@command-html
+@command-lock
+@command-push
+@command-take
+@command-view
+@command-wait
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "5"
+	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+
+@command-goto_exit
+	RETURN "goto_exit"
+	END
+
+@command-get_server_var
+@command-set_server_var
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "15"
+	SET_SUBSTR string, 15, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>
+	END
+
+@command-gotoscene
+	SET comstrtest, "goto_scene"
+	GOTO @command-goto_scene
+@command-partygive
+	SET comstrtest, "party_give"
+	GOTO @command-party_give
+@command-partytake
+	SET comstrtest, "party_take"
+	GOTO @command-party_take
+
+@command-goto_scene
+@command-party_give
+@command-party_take
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "11"
+	SET_SUBSTR string, 11, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+
+@command-if
+	CALL @separateSpaces #<commandstring>
+	RETURN #<arg0>, #<arg1>, #<arg2>
+	END
+
+@command-move
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "5"
+	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<arg3>
+	END
+
+@command-not
+@command-pop
+@command-sel
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "4"
+	SET_SUBSTR string, 4, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+
+@command-nth_token
+	SET cdelim, ","
+	SET cdelim, #<cdelim>"
+	SET cdelim, "#<cdelim>
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "10"
+	SET_SUBSTR string, 10, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	GOTO @command-nth_token-#<numArgs>
+	END
+@command-nth_token-4
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<arg3>
+	END
+@command-nth_token-5
+	COMPARE #<arg4>, "1"
+	IF!= @command-nth_token-5c
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>
+	END
+@command-nth_token-5c
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<cdelim>
+	END
+@command-nth_token-6
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<cdelim>, #<arg5>
+
+@command-pose
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "5"
+	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>
+	END
+
+@command-return
+	END
+
+@command-set_substr
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "11"
+	SET_SUBSTR string, 11, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>, #<arg3>
+	END
+	
+@command-weather
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "8"
+	SET_SUBSTR string, 8, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+	
+@command-find
+@command-sort
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "5"
+	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
+	SET comma, ","
+	STRSTR #<string>, #<comma>
+	IF= @command-fiso-nocomma
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+@command-fiso-nocomma
+	RETURN #<comstrtest>, #<string>
+	END
+
+
+@ExCommand
+	RETURN
+	END
+
+;Execute a command, used in both VS and Terminal to execute a single line of QUEST.  Each one is passed arguments in the manner that @splitCommand returns them.
+
+@ExCommandactor
+	ACTOR #<arg1>, "#<arg2>", #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>
+	RETURN
+	END
+
+@ExCommandadd
+@ExCommandand
+@ExCommanddiv
+@ExCommandface
+@ExCommandf_add
+@ExCommandf_div
+@ExCommandf_mod
+@ExCommandf_mul
+@ExCommandf_sub
+@ExCommandmod
+@ExCommandmul
+@ExCommandor
+@ExCommandset
+@ExCommandset_len
+@ExCommandsub
+@ExCommandxor
+	#<arg0> #<arg1>, "#<arg2>"
+	RETURN
+	END
+
+@ExCommandask
+	ASK #<arg1> #<arg2>
+	SET ExCommandasklastAsk, "#<lastAsk>"
+	RETURN
+	END
+
+@ExCommandbkgnd
+@ExCommandcolor
+@ExCommandcountdown
+@ExCommandeject
+@ExCommandflags
+@ExCommandfx
+@ExCommandgame
+@ExCommandgive
+@ExCommandhost_give
+@ExCommandhost_take
+@ExCommandlock
+@ExCommandnot
+@ExCommandparty_give
+@ExCommandparty_take
+@ExCommandsel
+@ExCommandsound
+@ExCommandtake
+@ExCommandtheme
+@ExCommandWait
+@ExCommandweather
+	#<arg0> #<arg1>
+	RETURN
+	END
+
+@ExCommandcall
+	#<arg0> #<arg1> #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
+	SET ExCommandCallarg0, #<arg0>
+	SET ExCommandCallarg1, #<arg1>
+	SET ExCommandCallarg2, #<arg2>
+	SET ExCommandCallarg3, #<arg3>
+	SET ExCommandCallarg4, #<arg4>
+	SET ExCommandCallarg5, #<arg5>
+	SET ExCommandCallarg6, #<arg6>
+	SET ExCommandCallarg7, #<arg7>
+	SET ExCommandCallarg8, #<arg8>
+	SET ExCommandCallarg9, #<arg9>
+	RETURN
+	END
+
+@ExCommandcompare
+@ExCommandf_compare
+@ExCommandstrcmp
+@ExCommandstrstr
+	#<arg0> #<arg1>, "#<arg2>"
+	IF= @ExCommandEq1	;Work on equality stuff!
+@ExCommandcompEq
+	IF> @ExCommandEq2
+@ExCommandcompGt
+	IF< @ExCommandEq4
+@ExCommandcompLt
+	IFEVEN @ExCommandEq8
+@ExCommandcompEven
+	IFODD @ExCommandEq16
+@ExCommandcompOdd
+	RETURN
+	END
+
+@ExCommanddialog
+	SEL #<arg1>
+	' #<arg2>
+	RETURN
+	END
+
+@ExCommandend
+	#<arg0>
+	END
+
+@ExCommandfight
+@ExCommandfight2
+@ExCommandoffer
+@ExCommandoffer2
+	#<arg0> #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
+	RETURN
+	END
+
+@ExCommandget_server_var
+@ExCommandpose
+@ExCommandset_server_var
+	#<arg0> #<arg1>, #<arg2>, #<arg3>
+	RETURN
+	END
+
+@ExCommandgoto_exit
+	GOTO EXIT
+	END
+
+@ExCommandgoto_link
+	GOTO LINK #<arg1>, #<arg2>, #<arg3>
+	RETURN
+	END
+
+@ExCommandgoto_scene
+	GOTO SCENE #<arg1>
+	RETURN
+	END
+
+@ExCommandif
+	COMPARE #<numArgs>, 2
+	IF= @ExCommandifcmp
+	IF #<arg1> @ExCommandif2true
+	RETURN
+@ExCommandifcmp
+	SET_SUBSTR ExCommandiftest, 2, 2, #<terminalcomstr>
+	STRCMP #<ExCommandiftest>, "!="
+	IF= @ExCommandifcmpNQ
+	STRCMP #<ExCommandiftest>, ">="
+	IF= @ExCommandifcmpGQ
+	STRCMP #<ExCommandiftest>, "<="
+	IF= @ExCommandifcmpLQ
+	STRCMP #<ExCommandiftest>, "="
+	IF= @ExCommandifcmpEQ
+	STRCMP #<ExCommandiftest>, ">"
+	IF= @ExCommandifcmpGT
+	STRCMP #<ExCommandiftest>, "<"
+	IF= @ExCommandifcmpLT
+	STRCMP #<ExCommandiftest>, "EV"
+	IF= @ExCommandifcmpEV
+	STRCMP #<ExCommandiftest>, "OD"
+	IF= @ExCommandifcmpOD
+	END
+@ExCommandifcmpNQ
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 6
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpGQ
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 3
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpLQ
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 5
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpEQ
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 1
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpGT
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 2
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpLT
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 4
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpEV
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 8
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandifcmpOD
+	SET ExCommandLastIf, #<ExCommandLastIf>
+	AND ExCommandLastIf, 16
+	COMPARE #<ExCommandLastIf>, 0
+	IF> @ExCommandiftrue
+	RETURN
+	END
+@ExCommandiftrue
+	CALL @splitcommand #<arg1>
+	STRCMP #<arg0>, "null"
+	IF= @ExCommandiftruego
+	END
+@ExCommandif2true
+	CALL @splitcommand #<arg2>
+	STRCMP #<arg0>, "null"
+	IF= @ExCommandiftruego
+	END
+@ExCommandiftruego
+	CALL @ExCommand#<arg0> #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
+	RETURN
+
+@ExCommandmove
+	MOVE #<arg1>, #<arg2>, #<arg3>, #<arg4>
+	RETURN
+	END
+
+@ExCommandnand
+	AND #<arg1>, "#<arg2>"
+	NOT #<arg1>
+	RETURN
+	END
+
+@ExCommandnor
+	OR #<arg1>, "#<arg2>"
+	NOT #<arg1>
+	RETURN
+	END
+
+@ExCommandnth_token
+	NTH_TOKEN #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>
+	RETURN
+	END
+
+@ExCommandreturn
+	RETURN
+	END
+
+@ExCommandset_substr
+	SET_SUBSTR #<arg1>, #<arg2>, #<arg3>, #<arg4>
+	RETURN
+	END
+
+@ExCommandview
+	N: #<arg1>: *#<arg1>
+	RETURN
+	END
+
+@ExCommandxnor
+	XOR #<arg1>, "#<arg2>"
+	NOT #<arg1>
+	RETURN
+	END
+
+@ExCommandEq1
+	OR ExCommandLastIf, "1"
+	GOTO @ExCommandcompEq
+@ExCommandEq2
+	OR ExCommandLastIf, "2"
+	GOTO @ExCommandcompGt
+@ExCommandEq4
+	OR ExCommandLastIf, "4"
+	GOTO @ExCommandcompLt
+@ExCommandEq8
+	OR ExCommandLastIf, "8"
+	GOTO @ExCommandcompEven
+@ExCommandEq16
+	OR ExCommandLastIf, "16"
+	GOTO @ExCommandcompOdd
+
+;ArrayCommand array, command
+;Executes a command (single-argument only) several times, passing items from an array as the argument.
+@ExCommandArrayCommand
+	SET index, 0
+	SET array, #<arg0>
+	SET command, #<arg1>
+	SET maxindex, *#<array>
+@ExCommandArrayCommandloop
+	ADD index, 1
+	PUSH #<array>-#<index>
+	POP argument
+	CALL @ExCommand#<command> #<command>, #<argument>
+	COMPARE #<index>, #<maxindex>
+	IF< @ExCommandArrayCommandloop
+	RETURN
+
+;end of command set functions
+@defaultcommandafter

@@ -1,0 +1,343 @@
+
+;array version 1.5
+
+	ADD functionlist, 1
+	SET functionlist-name-#<functionlist>, "array"
+	SET functionlist-version-#<functionlist>, "1.5"
+	GOTO @arrayafter
+
+;@arraycopy oldarray, newarray; RETURN newarray
+@arraycopy
+	SET #<arg1>, 0
+@arraycopyloop
+	ADD #<arg1>, 1
+	PUSH #<arg0>-*#<arg1>
+	POP #<arg1>-*#<arg1>
+	COMPARE *#<arg1>, *#<arg0>
+	IF< @arraycopyloop
+	RETURN #<arg1>
+	END
+	
+;ArrayMake makes an array of indices.
+;@arraymake array, size; RETURN array
+@arraymake
+	SET #<arg0>, 0
+@arraymakeloop
+	ADD #<arg0>, 1
+	SET #<arg0>-*#<arg0>, *#<arg0>
+	COMPARE *#<arg0>, #<arg1>
+	IF< @arraymakeloop
+	RETURN #<arg0>
+
+;Removes an entry from an array by index and returns the value at that index.
+;@arrayrem array, index; RETURN array, value
+@arrayrem
+	PUSH maxindex
+	PUSH value
+	COMPARE *#<arg0>, "0"
+	IF= @arrayremcorrect
+	SET maxindex, *#<arg0>
+	PUSH #<arg0>-#<arg1>
+	POP value
+@arrayremloop
+	COMPARE #<arg1>, #<maxindex>
+	IF= @arrayremloopafter
+	;This line should only be true in case of hard-wired grab-the-first-element on an empty array:
+	;(I guess it has the added benefit of out-of-bounds checking in general)
+	IF> @arrayremcorrect
+	ADD arg1, 1
+	PUSH #<arg0>-#<arg1>
+	SUB arg1, 1
+	POP #<arg0>-#<arg1>
+	ADD arg1, 1
+	GOTO @arrayremloop
+@arrayremloopafter
+	SUB #<arg0>, 1
+	SET arg1, #<value>
+	POP value
+	POP maxindex
+	RETURN #<arg0>, #<arg1>
+@arrayremcorrect
+	POP value
+	POP maxindex
+	RETURN #<arg0>, "(null)"
+	
+
+;@arrayadd array, value; RETURN array
+@arrayadd 
+	ADD #<arg0>, 1
+	SET #<arg0>-*#<arg0>, #<arg1>
+	RETURN #<arg0>
+
+;@arraycat, array, addarray; RETURN array
+@arraycat
+	PUSH index
+	SET index, 0
+@arraycatloop
+	ADD index, 1
+	ADD #<arg0>, 1
+	PUSH #<arg1>-#<index>
+	POP #<arg0>-*#<arg0>
+	COMPARE #<index>, *#<arg1>
+	IF< @arraycatloop
+	POP index
+	RETURN #<arg0>
+
+;ArraySub takes a chunk of an existing array and creates a new array with it, non-destructively to the source array.
+;@arraysub newarray, start, end, array; RETURN newarray
+@arraysub
+	PUSH readindex
+	PUSH maxindex
+	SET maxindex, #<arg2>
+	SET readindex, #<arg1>
+	SUB readindex, 1
+	SET #<arg0>, 0
+@arraysubloop
+	ADD readindex, 1
+	ADD #<arg0>, 1
+	PUSH #<arg3>-#<readindex>
+	POP #<arg0>-*#<arg0>
+	COMPARE *#<arg0>, #<readindex>
+	IF< @arraysubloop
+	POP maxindex
+	POP readindex
+	RETURN #<arg0>
+	END
+
+;ArrayInsert places an array value at a given index.
+;@arrayinsert array, value, index; RETURN array
+@arrayinsert
+	PUSH index
+	PUSH minindex
+	SUB arg2, 1
+	SET minindex, #<arg2>
+	ADD #<arg0>, 1
+	SET index, *#<arg0>
+@arrayinsertloop
+	SUB index, 1
+	PUSH #<arg0>-#<index>
+	ADD index, 1
+	POP #<arg0>-#<index>
+	SUB index, 1
+	COMPARE #<index>, #<minindex>
+	IF> @arrayinsertloop
+	SET #<arg0>-#<index>, #<arg1>
+	POP minindex
+	POP index
+	RETURN #<arg0>
+
+;ArrayMakeInsert creates an "empty" index by moving down all later indices.
+;@arraymakeinsert array, index; RETURN index
+@arraymakeinsert
+	PUSH index
+	PUSH minindex
+	;SUB arg2, 1
+	SET minindex, #<arg1>
+	ADD #<arg0>, 1
+	SET index, *#<arg0>
+@arraymakeinsertloop
+	SUB index, 1
+	PUSH #<arg0>-#<index>
+	ADD index, 1
+	POP #<arg0>-#<index>
+	SUB index, 1
+	COMPARE #<index>, #<minindex>
+	IF> @arraymakeinsertloop
+	POP minindex
+	POP index
+	RETURN #<arg1>
+
+;ArrayInsertArray copies the contents of an array into an existing array starting at a given index.
+;@arrayinsertarray array, newarray, index; RETURN array;
+@arrayinsertarray
+	PUSH arg1
+	PUSH arg2
+	CALL @arraymakeinsertarray #<arg0>, *#<arg1>, #<arg2>
+	POP arg2
+	POP arg1
+	PUSH index
+	PUSH copyindex
+	SET index, #<arg2>
+	SUB index, 1
+	SET copyindex, 0
+@arrayinsertarrayloop
+	ADD index, 1
+	ADD copyindex, 1
+	PUSH #<arg1>-#<copyindex>
+	POP #<arg0>-#<index>
+	COMPARE #<copyindex>, *#<arg1>
+	IF< @arrayinsertarrayloop
+	POP copyindex
+	POP index
+	RETURN #<arg0>
+	END
+
+;ArrayMakeInsertArray creates a gap in an array large enough to fit an array of a given size at index.
+;@arraymakeinsertarray array, size, index; RETURN array;
+@arraymakeinsertarray
+	PUSH index
+	PUSH minindex
+	PUSH newindex
+	SET minindex, #<arg2>
+	SUB minindex, 1
+	SET index, *#<arg0>
+	ADD #<arg0>, #<arg1>
+	SET newindex, *#<arg0>
+@arrayinsertloop
+	PUSH #<arg0>-#<index>
+	POP #<arg0>-#<newindex>
+	SUB index, 1
+	SUB newindex, 1
+	COMPARE #<index>, #<minindex>
+	IF>= @arrayinsertloop
+	POP newindex
+	POP minindex
+	POP index
+	RETURN #<arg0>
+
+;ArrayFindValue looks for a string in an array and returns the first index that contains it.
+;@arrayfindvalue array, value; RETURN array; index
+@arrayfindvalue
+	PUSH index
+	PUSH value
+	SET index, 0
+@arrayfindvalueloop
+		ADD index, 1
+		PUSH #<arg0>-#<index>
+		POP value
+		STRCMP #<value>, #<arg1>
+		IF= @arrayfindvaluefound
+		COMPARE #<index>, *#<arg0>
+		IF< @arrayfindvalueloop
+		POP value
+		POP index
+		RETURN 0
+@arrayfindvaluefound
+	SET arg1, #<index>
+	POP value
+	POP index
+	RETURN #<arg0>, #<arg1>
+	
+;ArraySortInsert places the current data value in a given position in the data set.
+;@arraysortinsert array, cursor, index, keyarray; RETURN array
+@arraysortinsert
+	PUSH index
+	SET index, #<arg1>
+	PUSH #<arg0>-#<arg1>
+	PUSH #<arg3>-#<arg1>
+@arraysortinsertloop
+		SUB index, 1
+		PUSH #<arg0>-#<index>
+		PUSH #<arg3>-#<index>
+		ADD index, 1
+		POP #<arg3>-#<index>
+		POP #<arg0>-#<index>
+		SUB index, 1
+		COMPARE #<index>, #<arg2>
+		IF> @arraysortinsertloop
+	POP #<arg3>-#<index>
+	POP #<arg0>-#<index>
+	POP index
+	RETURN #<arg0>, #<arg3>
+	
+;ArraySortString is designed to very simply sort an array alphabetically, with an optional key array.
+;If the value of keyarray is 0 (empty array), it will be generated with the indices of each element of the old array in their new positions.
+;If keyarray is the same size as the array to sort, the data in it will be moved to match the data being sorted.
+;@arraysortstring array, (boolean) descend, (optional) keyarray; RETURN array, keyarray
+@arraysortstring
+	PUSH index
+	PUSH curval
+	PUSH compval
+	PUSH cursor
+	PUSH array
+	PUSH keyarray
+	
+	SET keyarray, #<arg2>
+	SET array, #<arg0>
+	SET cursor, 1
+	SET index, 1
+	SET compval, 0
+	SET curval, 0
+	
+	COMPARE #<arg1>, 1
+	IF= @arraysortstringdescend
+	SET arraysortstringcompare, "<"
+@arraysortstringdescendreturn
+	STRCMP #<keyarray>, ""
+	IF= @arraysortstringskipkeyarray
+	COMPARE *#<keyarray>, 0
+	IF= @arraysortstringnewkeyarray
+	COMPARE *#<keyarray>, *#<array>
+	IF!= @arraysortstringskipkeyarray
+@arraysortstringkeyreturn
+	
+@arraysortstringloop
+	ADD cursor, 1
+	PUSH #<array>-#<cursor>
+	POP curval
+	SET index, #<cursor>
+@arraysortstringsubloop
+		SUB index, 1
+		PUSH #<array>-#<index>
+		POP compval
+		STRCMP #<curval>, #<compval>
+		IF#<arraysortstringcompare> @arraysortstringsubloop
+	CALL @arraysortinsert #<array>, #<cursor>, #<index>, #<keyarray>
+	COMPARE #<cursor>, *#<array>
+	IF< @arraysortstringloop
+	POP keyarray
+	POP array
+	POP cursor
+	POP compval
+	POP curval
+	POP index
+	RETURN #<arg0>, #<arg1>
+
+@arraysortstringdescend
+	SET arraysortstringcompare, ">"
+	GOTO @arraysortstringdescendreturn
+@arraysortstringskipkeyarray
+	SET keyarray, ""
+	GOTO @arraysortstringkeyreturn
+@arraysortstringnewkeyarray
+	CALL @arraymake #<keyarray>, *#<array>
+	GOTO @arraysortstringkeyreturn
+
+;This function is designed to add an existing array to the second dimension of an existing array, such that one array may contain multiple arrays.
+;@arrayaddD2array array, addarray; RETURN array
+@arrayaddD2array 
+	ADD #<arg0>, 1
+	PUSH arg0
+	CALL @arraycopy #<arg1>, #<arg0>-*#<arg0>
+	POP arg0
+	RETURN #<arg0>
+
+;This function is designed to remove a second-dimension array (array inside an array), preserving the other second-dimension arrays.
+;Need reworking.
+;@arrayremD2array array, D1index; RETURN
+@arrayremD2array 
+	PUSH maxindex
+	PUSH oldindex
+	PUSH newindex
+	SET maxindex, "*#<arg0>"
+	SET oldindex, "#<arg1>"
+	SET newindex, "#<arg1>"
+	SUB newindex, 1 ;Subtracts to get them at -1 and 0, relatively, before 1 is added to each.
+@arrayremD2arrayloop
+	ADD oldindex, 1
+	ADD newindex, 1
+	PUSH #<arg0>-#<oldindex>
+	POP #<arg0>-#<newindex>
+	PUSH arg0
+	CALL @arraycopy #<arg0>-#<oldindex>, #<arg0>-#<newindex>
+	POP arg0
+	COMPARE #<oldindex>, #<maxindex>
+	IF< @arrayremD2arrayloop
+	SUB #<arg0>, 1
+	POP newindex
+	POP oldindex
+	POP maxindex
+	RETURN #<arg0>
+
+;end of array functions
+@arrayafter

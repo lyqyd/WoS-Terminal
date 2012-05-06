@@ -1,0 +1,204 @@
+
+;string version 1.3
+
+	ADD functionlist, 1
+	SET functionlist-name-#<functionlist>, "string"
+	SET functionlist-version-#<functionlist>, "1.3"
+	GOTO @stringafter
+
+;@separateCommas string; RETURN (10 or fewer strings split by comma from input string)
+@separateCommas
+	SET string, #<arg0>
+	SET currtoken, -1
+@separateCommasLoop
+		ADD currtoken, 1
+		NTH_TOKEN str#<currtoken>, #<currtoken>, #<string>, ",", 1
+		COMPARE #<currtoken>, "9"
+		IF< @separateCommasLoop
+	RETURN #<str0>, #<str1>, #<str2>, #<str3>, #<str4>, #<str5>, #<str6>, #<str7>, #<str8>, #<str9>
+	END
+
+@separateSpaces
+	SET string, #<arg0>
+	SET currtoken, -1
+@separateSpacesLoop
+		ADD currtoken, 1
+		NTH_TOKEN str#<currtoken>, #<currtoken>, #<string>, " ", 1
+		COMPARE #<currtoken>, "9"
+		IF< @separateSpacesLoop
+	RETURN #<str0>, #<str1>, #<str2>, #<str3>, #<str4>, #<str5>, #<str6>, #<str7>, #<str8>, #<str9>
+	END
+
+
+;@stringGetStringByChar string; RETURN char, offset
+@stringGetStringByChar
+	PUSH strlen
+	STRCMP #<arg0>, #<stringGetStringByCharLastString>
+	IF= @stringGetStringByCharSkipReset
+	SET stringGetStringByCharLastString, #<arg0>
+	SET stringGetStringByCharOffset, -1
+@stringGetStringByCharSkipReset
+	ADD stringGetStringByCharOffset, 1
+	COMPARE #<stringGetStringByCharOffset>, #<strlen>
+	IF= @stringGetStringByCharEoS
+	SET_SUBSTR arg0, #<stringGetStringByCharOffset>, 1, #<arg0>
+	POP strlen
+	RETURN #<arg0>, #<stringGetStringByCharOffset>
+@stringGetStringByCharEoS
+	POP strlen
+	RETURN
+
+;offset in the RETURN returns the offset for the character after the replaced substring.
+;@stringReplaceSubString string, offset, length, newdata; RETURN string, offset, length
+@stringReplaceSubString
+	PUSH offset
+	PUSH strlen
+	PUSH first
+	PUSH last
+	PUSH string
+	SET_SUBSTR first, 0, #<arg1>, #<arg0>
+	SET_LEN strlen, #<arg0>
+	SUB strlen, #<arg1>
+	SUB strlen, #<arg2>
+	SET offset, #<arg1>
+	ADD offset, #<arg2>
+	SET_SUBSTR last, #<offset>, #<strlen>, #<arg0>
+	SET_LEN strlen, #<arg3>
+	SET_LEN arg1, #<first>
+	ADD arg1, #<strlen>
+	SET arg0, #<first>#<arg3>#<last>
+	SET_LEN arg2, #<arg0>
+	POP string
+	POP last
+	POP first
+	POP strlen
+	POP offset
+	RETURN #<arg0>, #<arg1>, #<arg2>
+
+;@menusetchecks <1-9 boolean values>; RETURN <1-9 blank/slash>
+@menusetchecks
+	PUSH index
+	PUSH label
+	SET index, -1
+	SUB numArgs, 1
+	;So that we start at arg0 and go through them properly.
+@menusetchecksloop
+		ADD index, 1
+		PUSH arg#<index>
+		POP label
+		GOTO @menusetchecksloop-#<label>
+		SET arg#<index>, ""
+	@menusetchecksloopreturn
+		COMPARE #<index>, #<numArgs>
+		IF< @menusetchecksloop
+		POP label
+		POP index
+		RETURN #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
+@menusetchecksloop-1
+	SET arg#<index>, "/"
+	GOTO @menusetchecksloopreturn
+	END
+
+;@deneststring string; RETURN string
+@deneststring
+	PUSH char
+	PUSH i
+	PUSH string
+	PUSH length
+	SET string, #<arg0>
+	STRSTR #<string>, "#"
+	IF= @donedenesting
+	SET_LEN length, #<string>
+	SET i, -1
+@findhashloop
+		ADD i, 1
+		SET_SUBSTR char, #<i>, 1, #<string>
+		STRCMP #<char>, "#"
+		IF= @foundhash
+		COMPARE #<i>, #<length>
+		IF< @findhashloop
+	SET arg0, #<string>
+@donedenesting
+	POP length
+	POP string
+	POP i
+	POP char
+	RETURN #<arg0>
+
+@foundhash
+	CALL @stringdenest #<i>, #<string>, #<length>
+	SET i, #<arg0>
+	SET string, #<arg1>
+	SET length, #<arg2>
+	SUB i, 1
+	GOTO @findhashloop
+
+;This function is intended to be called internally, by @deneststring and by itself (recursivity is key here!)
+;@stringdenest offset, string, length; RETURN offset, string, length
+@stringdenest
+	PUSH i
+	PUSH j
+	PUSH char
+	SET i, #<arg0>
+	SET j, #<i>
+	ADD j, 1
+	SET_SUBSTR char, #<j>, 1, #<arg1>
+	STRCMP #<char>, "<"
+	IF!= @stringdenestreturn
+@stringdenestsearchloop
+		ADD j, 1
+		SET_SUBSTR char, #<j>, 1, #<arg1>
+		STRCMP #<char>, ">"
+		IF= @stringdenestfoundend
+		STRCMP #<char>, "#"
+		IF= @stringdenestrecurse
+		COMPARE #<j>, #<arg2>
+		IF< @stringdenestsearchloop
+	SET arg0, #<j>
+	POP char
+	POP j
+	POP i
+	RETURN #<arg0>, #<arg1>, #<arg2>
+
+@stringdenestfoundend
+	PUSH astr
+	PUSH name
+	SUB i, 1
+	SET_SUBSTR astr, #<i>, 1, #<arg1>
+	ADD i, 3
+	SUB j, #<i>
+	SET_SUBSTR name, #<i>, #<j>, #<arg1>
+	PUSH #<name>
+	POP name
+	STRCMP #<astr>, "*"
+	IF!= @stringdenestfoundendskip
+	PUSH #<name>
+	POP name
+	SUB i, 1
+	ADD j, 1
+@stringdenestfoundendskip
+	SUB i, 2
+	ADD j, 3
+	;i becomes the offset which begins the cookie name string, starting with either * or #, j becomes the total length of the cookie name string.
+	CALL @stringReplaceSubString #<arg1>, #<i>, #<j>, #<name>
+	PUSH arg0
+	PUSH arg1
+	POP arg0
+	POP arg1
+	POP name
+	POP astr
+	POP char
+	POP j
+	POP i
+	RETURN #<arg0>, #<arg1>, #<arg2>
+
+@stringdenestrecurse
+	CALL @stringdenest #<j>, #<arg1>, #<arg2>
+	COMPARE #<arg0>, #<arg2>
+	IF>= @stringdenestdone
+	SET j, #<arg0>
+	SUB j, 1
+	GOTO @stringdenestsearchloop
+
+;end of string functions
+@stringafter

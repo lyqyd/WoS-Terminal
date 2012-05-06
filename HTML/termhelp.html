@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Terminal Help Page - WorldDeveloper.net</title>
+<meta name="keywords" content="Well of Souls,TTDPatch,Transport Tycoon,WoS,Demonica,Flamelord">
+<meta name="description" content="Downloads for WoS and TTDPatch.">
+<script src="menuscript.js" language="javascript" type="text/javascript"></script>
+<link rel="StyleSheet" type="text/css" href="layout.css">
+<link rel="StyleSheet" type="text/css" href="pagestyle.css">
+<link rel="stylesheet" type="text/css" href="menustyle.css" media="screen, print" />
+</head>
+<body>
+
+<div id="menu">
+<a href="index.html" onmouseover="setOverImg('1','');overSub=true;showSubMenu('submenu1','button1');" onmouseout="setOutImg('1','');overSub=false;setTimeout('hideSubMenu(\'submenu1\')',delay);" target="_self"><img src="buttons/button1up.png" border="0" id="button1" vspace="0" hspace="0"></a><br>
+<a href="wellofsouls.html" onmouseover="setOverImg('2','');overSub=true;showSubMenu('submenu2','button2');" onmouseout="setOutImg('2','');overSub=false;setTimeout('hideSubMenu(\'submenu2\')',delay);" target="_self"><img src="buttons/button2up.png" border="0" id="button2" vspace="0" hspace="0"></a><br>
+<a href="ttdpatch.html" onmouseover="setOverImg('3','');overSub=true;showSubMenu('submenu3','button3');" onmouseout="setOutImg('3','');overSub=false;setTimeout('hideSubMenu(\'submenu3\')',delay);" target="_self"><img src="buttons/button3up.png" border="0" id="button3" vspace="0" hspace="0"></a><br>
+<a href="contact.html" onmouseover="setOverImg('4','');overSub=true;showSubMenu('submenu4','button4');" onmouseout="setOutImg('4','');overSub=false;setTimeout('hideSubMenu(\'submenu4\')',delay);" target="_self"><img src="buttons/button4up.png" border="0" id="button4" vspace="0" hspace="0"></a>
+</div>
+
+<div id=content>
+<span class="titles"><center>
+Terminal Help Page
+</center></span>
+<span class="body">
+<span class="sub-titles">Usage Help</span>
+<p>Terminal is designed to give low-level access to QUEST commands, allowing you to run commands straight from the prompt.  It allows you to input almost every command with their arguments and have the engine execute them right away.  Commands listed with their names in <span class="extracommand">red</span> are either commands not originally present in QUEST, or with expanded capabilities.</p>
+
+<table>
+<tr><th>Command</th><th>Syntax</th></tr>
+<tr><td class="commandname">Re-enter scene and lock on entry</td><td class="commandsyntax">lockload</td></tr>
+<tr><td class="commandname">Terminal Menu</td><td class="commandsyntax">tmenu</td></tr>
+<tr><td class="commandname">Plugins</td><td class="commandsyntax">plugins</td></tr>
+<tr><td class="commandname">Help (this help file)</td><td class="commandsyntax">help</td></tr>
+<tr><th>QUEST Command</th><th>Syntax</th></tr>
+<tr><td class="commandname"><span class="extracommand">@</span></td><td class="commandsyntax">@[label]</td></tr>
+
+<tr><td class="commandname">'</td><td class="commandsyntax">' [dialog]</td></tr>
+<tr><td class="commandname">ACTOR</td><td class="commandsyntax">actor [id],"[name]", [skin], [frame], [x], [y], (color), (pain)</td></tr>
+<tr><td class="commandname">ADD</td><td class="commandsyntax">add [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">AND</td><td class="commandsyntax">and [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">ASK</td><td class="commandsyntax">ask [time] [hidden]</td></tr>
+
+<tr><td class="commandname">BKGND</td><td class="commandsyntax">bkgnd [image]</td></tr>
+<tr><td class="commandname">CALL</td><td class="commandsyntax">call [scene]@[label]</td></tr>
+<tr><td class="commandname">COLOR</td><td class="commandsyntax">color [color code]</td></tr>
+<tr><td class="commandname">COMPARE</td><td class="commandsyntax">compare [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">COUNTDOWN</td><td class="commandsyntax">countdown [time]</td></tr>
+
+<tr><td class="commandname">Dialog</td><td class="commandsyntax">dialog [actor] [dialog]</td></tr>
+<tr><td class="commandname">DIV</td><td class="commandsyntax">div [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">EJECT</td><td class="commandsyntax">eject [requirement]</td></tr>
+
+<tr><td class="commandname">END</td><td class="commandsyntax">end</td></tr>
+<tr><td class="commandname">F_ADD</td><td class="commandsyntax">f_add [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">F_DIV</td><td class="commandsyntax">f_div [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">F_MOD</td><td class="commandsyntax">f_mod [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">F_MUL</td><td class="commandsyntax">f_mul [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">F_SUB</td><td class="commandsyntax">f_sub [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">F_COMPARE</td><td class="commandsyntax">f_compare [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">FACE</td><td class="commandsyntax">face [actor] [direction]</td></tr>
+<tr><td class="commandname">FX</td><td class="commandsyntax">fx [fx]</td></tr>
+<tr><td class="commandname">GAME</td><td class="commandsyntax">game [game]</td></tr>
+<tr><td class="commandname">GET_SERVER_VAR</td><td class="commandsyntax">get_server_var [cookiename] [category] [variable]</td></tr>
+<tr><td class="commandname">GIVE</td><td class="commandsyntax">give [object ID]</td></tr>
+<tr><td class="commandname">GOTO</td><td class="commandsyntax">goto @[label]</td></tr>
+
+<tr><td class="commandname">GOTO EXIT</td><td class="commandsyntax">goto exit OR goto_exit</td></tr>
+
+<tr><td class="commandname">GOTO LINK</td><td class="commandsyntax">goto link [map], [link], [dropin] OR <br> goto_link [map], [link], [dropin]</td></tr>
+
+<tr><td class="commandname">GOTO SCENE</td><td class="commandsyntax">goto scene [scene] OR goto_scene [scene]</td></tr>
+
+<tr><td class="commandname">HOST_GIVE</td><td class="commandsyntax">host_give [object ID] OR host give [object ID]</td></tr>
+<tr><td class="commandname">HOST_TAKE</td><td class="commandsyntax">host_take [object ID] OR host take [object ID]</td></tr>
+<tr><td class="commandname">HTML</td><td class="commandsyntax">html [url]</td></tr>
+
+<tr><td class="commandname"><span class="extracommand">IF</span></td><td class="commandsyntax">if [conditional] [action...]</td></tr>
+
+<tr><td class="commandname">LOCK</td><td class="commandsyntax">lock [lock]</td></tr>
+
+<tr><td class="commandname">MOD</td><td class="commandsyntax">mod [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">MOVE</td><td class="commandsyntax">move [actor], [x], [y], [speed]</td></tr>
+
+<tr><td class="commandname">MUL</td><td class="commandsyntax">mul [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">MUSIC</td><td class="commandsyntax">music [midi music]</td></tr>
+
+<tr><td class="commandname"><span class="extracommand">NAND</span></td><td class="commandsyntax">nand [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname"><span class="extracommand">NOR</span></td><td class="commandsyntax">nor [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">NOT</td><td class="commandsyntax">not [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">OR</td><td class="commandsyntax">or [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">PARTY</td><td class="commandsyntax">party [requirement]</td></tr>
+
+<tr><td class="commandname">PARTY_GIVE</td><td class="commandsyntax">party_give [object ID]</td></tr>
+
+<tr><td class="commandname">PARTY_TAKE</td><td class="commandsyntax">party_take [object ID]</td></tr>
+
+<tr><td class="commandname">POP</td><td class="commandsyntax">pop [cookiename]</td></tr>
+
+<tr><td class="commandname">POSE</td><td class="commandsyntax">pose [actor], [pose], [pose], [pose]</td></tr>
+<tr><td class="commandname">PUSH</td><td class="commandsyntax">push [cookiename</td></tr>
+
+<tr><td class="commandname">RETURN</td><td class="commandsyntax">return</td></tr>
+
+<tr><td class="commandname">SEL</td><td class="commandsyntax">sel [actor]</td></tr>
+<tr><td class="commandname">SET</td><td class="commandsyntax">set [cookiename], [value]</td></tr>
+<tr><td class="commandname">SET_SERVER_VAR</td><td class="commandsyntax">set_server_var [category] [variable] [value]</td></tr>
+<tr><td class="commandname">SET_SUBSTR</td><td class="commandsyntax">set_substr [cookiename], [offset], [length], [value]</td></tr>
+<tr><td class="commandname">SOUND</td><td class="commandsyntax">sound [wav sound]</td></tr>
+
+<tr><td class="commandname">STRCMP</td><td class="commandsyntax">strcmp [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">STRSTR</td><td class="commandsyntax">strstr [cookiename], [(value) OR (cookiename)]</td></tr>
+<tr><td class="commandname">SUB</td><td class="commandsyntax">sub [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">TAKE</td><td class="commandsyntax">take [object ID]</td></tr>
+<tr><td class="commandname">THEME</td><td class="commandsyntax">theme [theme]</td></tr>
+
+<tr><td class="commandname">TIMER</td><td class="commandsyntax">timer [ID], [time]</td></tr>
+<tr><td class="commandname"><span class="extracommand">VIEW</span></td><td class="commandsyntax">view [cookiename]</td></tr>
+
+<tr><td class="commandname">WAIT</td><td class="commandsyntax">wait [time]</td></tr>
+
+<tr><td class="commandname">WEATHER</td><td class="commandsyntax">weather [weather]</td></tr>
+<tr><td class="commandname"><span class="extracommand">XNOR</span></td><td class="commandsyntax">xnor [cookiename], [(value) OR (cookiename)]</td></tr>
+
+<tr><td class="commandname">XOR</td><td class="commandsyntax">xor [cookiename], [(value) OR (cookiename)]</td></tr>
+
+</table>
+</div>
+
+</body>
+</html>

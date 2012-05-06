@@ -1,0 +1,112 @@
+;Terminal.
+
+	CALL 2240@checkversion terminal, 1.2
+	COMPARE #<arg0>, 1
+	IF!= @terminalexit
+
+	SET terminalplugins, 0
+	SET terminalpluginoptions, 0
+	SET terminalplugincallbacks, 0
+	SET arg0, "0"
+
+	#include terminalplugins.txt
+
+@terminallockloadtest
+	COMPARE #<terminallockload>, "1"
+	IF!= @terminalloadnorm
+	LOCK 1
+	SET terminallockload, "0"
+@terminalloadnorm
+	SET terminalversion, "0.4.1"
+	COMPARE #<num.wosVersion>, "2710"
+	IF< @terminalexit
+	COMPARE terminaldefaultx, "1"
+	IF= @terminalexit
+	ACTOR 30, "Terminal", Terminal, 1, 85, 12
+	GOTO @terminaldone
+	END
+
+@eventActorClick30
+	STRCMP #<terminalhook>, ""
+	IF!= @#<terminalhook>
+@terminal
+	ASK 240 1
+	SET terminalcomstr, "#<lastAsk>"
+	SET num.devTableId, "89"
+	SET str.devTableRowId, "#<str.soul>"
+	SET terminalpermissions, 0
+	COMPARE #<terminalpermissions>, "0"
+	IF> @terminalend
+	SET terminalpermissions, "#<str.devTableCOL1>"
+	GOTO @terminalcommandinterpret#<terminalpermissions>
+	END
+
+@terminalcommandinterpret5
+	
+@terminalcommandinterpret4
+	
+	CALL 2240@splitcommand #<lastAsk>
+	STRCMP #<arg0>, "null"
+	IF!= @terminalcodeEx
+	
+@terminalcommandinterpret3
+
+	IF Qlockload @terminallockreload
+
+@terminalcommandinterpret2
+
+@terminalcommandinterpret1
+
+@terminalcommandinterpret0
+
+	IF Qhelp @terminalcommands
+	IF Qversion @terminalversion
+
+	CALL 2240@terminalcheckpluginoptions #<terminalpermissions>
+	STRCMP #<arg0>, "0"
+	IF= @terminalend
+	CALL @#<arg0> #<terminalcomstr>
+	END 
+@terminalcommandinterpret-1
+	SET terminaldefaultx, "1"
+	MOVE 30, -100, -100, 1
+	END
+
+@terminalcommands
+	HTML "terminalhelp.html"
+	END
+
+@terminalversion
+	N: #<terminalversion>
+	GOTO @terminal
+
+@terminallockreload
+	SET terminallockload, "1"
+	GOTO SCENE #<scene.id>
+	END
+
+@terminalcodeEx
+	CALL 2240@ExCommand#<arg0> #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
+	GOTO @terminal
+	END
+
+@terminalend
+	END
+@terminaldone
+	SET num.devTableId, "89"
+	SET str.devTableRowId, "#<str.soul>"
+	SET terminalpermissions, 0
+	COMPARE #<terminalpermissions>, "0"
+	IF> @terminalexit
+	SET terminalpermissions, "#<str.devTableCOL1>"
+	CALL 2240@terminalgetplugincallbacks #<terminalpermissions>
+@terminalcallbackloop
+	CALL 2240@arrayrem terminalcallbacklist, #<terminalcallbacklist>
+	STRCMP #<arg1>, "(null)"
+	IF= @terminalexit
+	CALL @#<arg1>
+	GOTO @terminalcallbackloop
+
+@terminalexit
+
+

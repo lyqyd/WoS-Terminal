@@ -1,0 +1,25 @@
+.links {
+	border: 2px solid grey;
+}
+
+.links td {
+	border: 1px solid silver;
+}
+
+.image img {
+	width:88px;
+	border:2px;
+	
+}
+
+.shortdesc {
+	width:180px;
+	text-align:center;
+	vertical-align:middle;
+}
+
+.longdesc {
+	width:450px;
+	text-align:left;
+	vertical-align:top;
+}

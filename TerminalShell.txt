@@ -1,0 +1,40 @@
+
+END
+
+@terminal0
+	ASK 240 1
+	SET terminalcomstr, "#<lastAsk>"
+	SET num.devTableId, "89"
+	SET str.devTableRowId, "#<str.soul>"
+	GOTO @terminalcommandinterpret#<str.devTableCOL1>
+	GOTO @terminalcommandinterpret0
+	END
+
+@terminalcommandinterpret5
+	GOTO @terminalpluginshell5
+
+@terminalcommandinterpret4
+	GOTO @terminalpluginshell4
+
+@terminalcommandinterpret3
+	GOTO @terminalpluginshell3
+
+@terminalcommandinterpret2
+	GOTO @terminalpluginshell2
+
+@terminalcommandinterpret1
+	GOTO @terminalpluginshell1
+
+@terminalcommandinterpret0
+	IF Qhelp @terminalcommands
+	GOTO @terminalpluginshell0
+	END 
+@terminalcommandinterpret-1
+	END
+
+@terminalcommands
+	HTML "HTML\termshellhelp.html"
+	RETURN null
+	END
+
+END

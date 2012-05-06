@@ -1,0 +1,45 @@
+
+SCENE 2240
+END
+
+@getfunctions
+	SET functionlist, 0
+
+#include functions\array.qsf
+#include functions\string.qsf
+#include functions\commandset.txt
+#include functions\terminalfunctions.txt
+
+	RETURN functionlist
+
+END
+
+;@checkversion name, minversion; RETURN bool meetsminimum
+@checkversion
+	PUSH index
+	PUSH compstr
+	SET index, 0
+	COMPARE #<functionlist>, "0"
+	IF> @checkversionloop
+	CALL @getfunctions
+@checkversionloop
+		ADD index, 1
+		COMPARE #<functionlist>, #<index>
+		IF< @checkversionfail
+		PUSH functionlist-name-#<index>
+		POP compstr
+		STRCMP #<arg0>, #<compstr>
+		IF!= @checkversionloop
+	PUSH functionlist-version-#<index>
+	POP compstr
+	F_COMPARE #<arg1>, #<compstr>
+	IF> @checkversionfail
+	POP compstr
+	POP index
+	RETURN 1
+	END
+@checkversionfail
+	POP compstr
+	POP index
+	RETURN 0
+	END
