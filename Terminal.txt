@@ -1,8 +1,14 @@
 ;Terminal.
 
-	CALL 2240@checkversion terminal, 1.2
-	COMPARE #<arg0>, 1
-	IF!= @terminalexit
+	PUSH dependencycheck
+	SET dependencycheck, 0
+	CALL 2240@checkversion terminal, 1.3
+	ADD dependencycheck, #<arg0>
+	CALL 2240@checkversion defaultcommand, 1.5
+	ADD dependencycheck, #<arg0>
+	COMPARE #<dependencycheck>, 2
+	POP dependencycheck
+	IF< @terminalexit
 
 	SET terminalplugins, 0
 	SET terminalpluginoptions, 0
@@ -17,7 +23,7 @@
 	LOCK 1
 	SET terminallockload, "0"
 @terminalloadnorm
-	SET terminalversion, "0.4.1"
+	SET terminalversion, "0.4.3"
 	COMPARE #<num.wosVersion>, "2710"
 	IF< @terminalexit
 	COMPARE terminaldefaultx, "1"
@@ -66,6 +72,9 @@
 	STRCMP #<arg0>, "0"
 	IF= @terminalend
 	CALL @#<arg0> #<terminalcomstr>
+	STRCMP #<arg0>, 0
+	IF= @eventActorClick30
+	IF> @#<arg0>
 	END 
 @terminalcommandinterpret-1
 	SET terminaldefaultx, "1"
@@ -86,9 +95,24 @@
 	END
 
 @terminalcodeEx
+	STRCMP "#<arg0>-#<arg1>", "find-interactive"
+	IF= @terminalfindinteractive
 	CALL 2240@ExCommand#<arg0> #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
 	GOTO @terminal
 	END
+
+@terminalfindinteractive
+	N: What type of object to find?
+	N: (item, monster, spell)
+	ASK 240 1
+	SET arg1, #<lastAsk>
+	N: Which attribute to search?
+	ASK 240 1
+	SET arg2, #<lastAsk>
+	N: Value to find?
+	ASK 240 1
+	SET arg3, #<lastAsk>
+	GOTO @terminalcodeEx
 
 @terminalend
 	END
@@ -108,5 +132,3 @@
 	GOTO @terminalcallbackloop
 
 @terminalexit
-
-
