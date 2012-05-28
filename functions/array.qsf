@@ -1,20 +1,20 @@
 
-;array version 1.5
+;array version 1.8
 
 	ADD functionlist, 1
 	SET functionlist-name-#<functionlist>, "array"
-	SET functionlist-version-#<functionlist>, "1.5"
+	SET functionlist-version-#<functionlist>, "1.8"
 	GOTO @arrayafter
 
 ;@arraycopy oldarray, newarray; RETURN newarray
 @arraycopy
 	SET #<arg1>, 0
 @arraycopyloop
-	ADD #<arg1>, 1
-	PUSH #<arg0>-*#<arg1>
-	POP #<arg1>-*#<arg1>
-	COMPARE *#<arg1>, *#<arg0>
-	IF< @arraycopyloop
+		ADD #<arg1>, 1
+		PUSH #<arg0>-*#<arg1>
+		POP #<arg1>-*#<arg1>
+		COMPARE *#<arg1>, *#<arg0>
+		IF< @arraycopyloop
 	RETURN #<arg1>
 	END
 	
@@ -23,10 +23,30 @@
 @arraymake
 	SET #<arg0>, 0
 @arraymakeloop
-	ADD #<arg0>, 1
-	SET #<arg0>-*#<arg0>, *#<arg0>
-	COMPARE *#<arg0>, #<arg1>
-	IF< @arraymakeloop
+		ADD #<arg0>, 1
+		SET #<arg0>-*#<arg0>, *#<arg0>
+		COMPARE *#<arg0>, #<arg1>
+		IF< @arraymakeloop
+	RETURN #<arg0>
+
+;ArrayInvert swaps the order of values in an array
+;@arrayInvert array; RETURN array
+@arrayInvert
+	PUSH index
+	PUSH backindex
+	SET index, 0
+	SET backindex, *#<arg0>
+@arrayInvertLoop
+		PUSH #<arg0>-#<index>
+		PUSH #<arg0>-#<backindex>
+		POP #<arg0>-#<index>
+		POP #<arg0>-#<backindex>
+		ADD index, 1
+		SUB backindex, 1
+		COMPARE #<index>, #<backindex>
+		IF< @arrayInvertLoop
+	POP backindex
+	POP index
 	RETURN #<arg0>
 
 ;Removes an entry from an array by index and returns the value at that index.
@@ -35,7 +55,7 @@
 	PUSH maxindex
 	PUSH value
 	COMPARE *#<arg0>, "0"
-	IF= @arrayremcorrect
+	IF<= @arrayremcorrect
 	SET maxindex, *#<arg0>
 	PUSH #<arg0>-#<arg1>
 	POP value
@@ -61,7 +81,6 @@
 	POP value
 	POP maxindex
 	RETURN #<arg0>, "(null)"
-	
 
 ;@arrayadd array, value; RETURN array
 @arrayadd 
@@ -205,8 +224,8 @@
 		ADD index, 1
 		PUSH #<arg0>-#<index>
 		POP value
-		STRCMP #<value>, #<arg1>
-		IF= @arrayfindvaluefound
+		STRSTR #<value>, #<arg1>
+		IF> @arrayfindvaluefound
 		COMPARE #<index>, *#<arg0>
 		IF< @arrayfindvalueloop
 		POP value
@@ -217,91 +236,160 @@
 	POP value
 	POP index
 	RETURN #<arg0>, #<arg1>
-	
-;ArraySortInsert places the current data value in a given position in the data set.
-;@arraysortinsert array, cursor, index, keyarray; RETURN array
-@arraysortinsert
+
+;ArrayFindExactValue looks for a string in an array and returns the first index that contains that string exactly.
+;@arrayfindexactvalue array, value; RETURN array; index
+@arrayfindexactvalue
+	PUSH index
+	PUSH value
+	SET index, 0
+@arrayfindexactvalueloop
+		ADD index, 1
+		PUSH #<arg0>-#<index>
+		POP value
+		STRCMP #<value>, #<arg1>
+		IF= @arrayfindvaluefound
+		COMPARE #<index>, *#<arg0>
+		IF< @arrayfindexactvalueloop
+		POP value
+		POP index
+		RETURN 0
+@arrayfindexactvaluefound
+	SET arg1, #<index>
+	POP value
+	POP index
+	RETURN #<arg0>, #<arg1>
+
+;@arraymove array; indexfrom, indexto
+@arraymove
+	COMPARE #<arg1>, #<arg2>
+	IF= @arraymovecleandone
+	IF< @arraymovedown
 	PUSH index
 	SET index, #<arg1>
-	PUSH #<arg0>-#<arg1>
-	PUSH #<arg3>-#<arg1>
-@arraysortinsertloop
+	PUSH #<arg0>-#<index>
+	;grab the item to move.
+@arraymoveloop
 		SUB index, 1
 		PUSH #<arg0>-#<index>
-		PUSH #<arg3>-#<index>
 		ADD index, 1
-		POP #<arg3>-#<index>
 		POP #<arg0>-#<index>
 		SUB index, 1
+		IF= @arraymovebreakloop
 		COMPARE #<index>, #<arg2>
-		IF> @arraysortinsertloop
-	POP #<arg3>-#<index>
+		IF> @arraymoveloop
+@arraymovebreakloop
 	POP #<arg0>-#<index>
 	POP index
-	RETURN #<arg0>, #<arg3>
-	
-;ArraySortString is designed to very simply sort an array alphabetically, with an optional key array.
-;If the value of keyarray is 0 (empty array), it will be generated with the indices of each element of the old array in their new positions.
-;If keyarray is the same size as the array to sort, the data in it will be moved to match the data being sorted.
-;@arraysortstring array, (boolean) descend, (optional) keyarray; RETURN array, keyarray
-@arraysortstring
+@arraymovecleandone
+	RETURN
+@arraymovedown
 	PUSH index
+	SET index, #<arg1>
+	PUSH #<arg0>-#<index>
+	;grab the item to move.
+@arraymovedownloop
+		ADD index, 1
+		PUSH #<arg0>-#<index>
+		SUB index, 1
+		POP #<arg0>-#<index>
+		ADD index, 1
+		COMPARE #<index>, *#<arg0>
+		IF= @arraymovedownbreakloop
+		COMPARE #<index>, #<arg2>
+		IF< @arraymovedownloop
+@arraymovedownbreakloop
+	POP #<arg0>-#<index>
+	POP index
+	RETURN
+
+;Key Arrays are an array where each value is the index of the new position of the item which used to be found at the index of the value.  So the key array of an array which used to have bob at position three will have bob's new index at position three.
+;@arraysort array; RETURN array, keyarray
+@arraysort
+	COMPARE *#<arg0>, 2
+	IF< @arraysortcleandone
+	PUSH array
+	PUSH index
+	PUSH cursor
 	PUSH curval
 	PUSH compval
-	PUSH cursor
-	PUSH array
-	PUSH keyarray
-	
-	SET keyarray, #<arg2>
 	SET array, #<arg0>
+	CALL @arraymake sortkeys, *#<array>
 	SET cursor, 1
-	SET index, 1
-	SET compval, 0
-	SET curval, 0
-	
-	COMPARE #<arg1>, 1
-	IF= @arraysortstringdescend
-	SET arraysortstringcompare, "<"
-@arraysortstringdescendreturn
-	STRCMP #<keyarray>, ""
-	IF= @arraysortstringskipkeyarray
-	COMPARE *#<keyarray>, 0
-	IF= @arraysortstringnewkeyarray
-	COMPARE *#<keyarray>, *#<array>
-	IF!= @arraysortstringskipkeyarray
-@arraysortstringkeyreturn
-	
-@arraysortstringloop
+	;cursor can be one, since we start on the second item of the array to compare backwards.
+@arraysortloop
 	ADD cursor, 1
 	PUSH #<array>-#<cursor>
 	POP curval
 	SET index, #<cursor>
-@arraysortstringsubloop
+@arraysortsubloop
 		SUB index, 1
+		IF= @arraysortbreaksubloop
 		PUSH #<array>-#<index>
 		POP compval
 		STRCMP #<curval>, #<compval>
-		IF#<arraysortstringcompare> @arraysortstringsubloop
-	CALL @arraysortinsert #<array>, #<cursor>, #<index>, #<keyarray>
+		IF< @arraysortsubloop
+@arraysortbreaksubloop
+	CALL @arraymove #<array>, #<cursor>, #<index>
+	CALL @arraysortupdatekeys #<cursor>, #<index>
 	COMPARE #<cursor>, *#<array>
-	IF< @arraysortstringloop
-	POP keyarray
-	POP array
-	POP cursor
+	IF< @arraysortloop
 	POP compval
 	POP curval
+	POP cursor
 	POP index
-	RETURN #<arg0>, #<arg1>
+	SET arg0, #<array>
+	POP array
+	RETURN #<arg0>, sortkeys
 
-@arraysortstringdescend
-	SET arraysortstringcompare, ">"
-	GOTO @arraysortstringdescendreturn
-@arraysortstringskipkeyarray
-	SET keyarray, ""
-	GOTO @arraysortstringkeyreturn
-@arraysortstringnewkeyarray
-	CALL @arraymake #<keyarray>, *#<array>
-	GOTO @arraysortstringkeyreturn
+;Update keys is meant to be called only from the Array Sort function, which has the name of the array it uses hard-coded, so it only needs the two indices in order to update the key array.
+;@arraysortupdatekeys indexfrom, indexto
+@arraysortupdatekeys
+	PUSH index
+	PUSH value
+	SET index, #<sortkeys>
+	ADD index, 1
+@arraysortupdatekeysloop
+		SUB index, 1
+		IF= @arraysortupdatekeysbreakloop
+		PUSH sortkeys-#<index>
+		POP value
+		COMPARE #<value>, #<arg0>
+		IF= @arraysortupdatekeysspecial
+		IF> @arraysortupdatekeysloop
+		COMPARE #<value>, #<arg1>
+		IF< @arraysortupdatekeysloop
+		ADD sortkeys-#<index>, 1
+		GOTO @arraysortupdatekeysloop
+@arraysortupdatekeysbreakloop
+	POP value
+	POP index
+	RETURN
+@arraysortupdatekeysspecial
+	SET sortkeys-#<index>, #<arg1>
+	GOTO @arraysortupdatekeysloop
+
+;Key sorting takes an unsorted array (which a parallel array of has already been sorted) and re-orders it using a matching key array.  Useful for sorting find results from Terminal, which come in an ID array and an attribute array.
+;@arraykeysort array, keyarray; RETURN array
+@arraykeysort
+	PUSH index
+	PUSH value
+	SET index, 0
+@arraykeysortloop
+	ADD index, 1
+	PUSH index
+	PUSH #<arg0>-#<index>
+	PUSH #<arg1>-#<index>
+	POP index
+	POP value
+	SET arraysorted-#<index>, #<value>
+	POP index
+	COMPARE #<index>, *#<arg0>
+	IF< @arraykeysortloop
+	POP value
+	POP index
+	CALL @arraycopy arraysorted, #<arg0>
+	RETURN #<arg0>
 
 ;This function is designed to add an existing array to the second dimension of an existing array, such that one array may contain multiple arrays.
 ;@arrayaddD2array array, addarray; RETURN array
