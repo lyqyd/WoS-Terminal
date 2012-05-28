@@ -1,18 +1,18 @@
 
-;terminal functions version 1.2
+;terminal functions version 1.3
 
+	PUSH depndencycheck
 	SET dependencycheck, 0
-	CALL @checkversion array, 1.5
+	CALL @checkversion array, 1.8
 	ADD dependencycheck, #<arg0>
 	CALL @checkversion string, 1.2
 	ADD dependencycheck, #<arg0>
-	CALL @checkversion defaultcommand, 1.4
-	ADD dependencycheck, #<arg0>
-	COMPARE #<dependencycheck>, 3
+	COMPARE #<dependencycheck>, 2
+	POP dependencycheck
 	IF< @terminalafter
 	ADD functionlist, 1
 	SET functionlist-name-#<functionlist>, "terminal"
-	SET functionlist-version-#<functionlist>, "1.2"
+	SET functionlist-version-#<functionlist>, "1.3"
 	GOTO @terminalafter
 
 ;@terminalregisterplugin pluginname, array pluginoptions, array plugincallbacks; RETURN void
@@ -168,7 +168,7 @@
 @terminalgetplugincallbacksadd
 	PUSH terminalplugincallbacks-#<index>
 	POP value
-	CALL 2240@arrayadd terminalcallbacklist, #<value>
+	CALL @arrayadd terminalcallbacklist, #<value>
 	COMPARE #<index>, #<terminalplugincallbacks>
 	IF< @terminalgetplugincallbacksloop
 	GOTO @terminalgetplugincallbacksdone
@@ -193,386 +193,99 @@
 	SET terminalhook, ""
 	RETURN 0
 
-;@interpretpipe
-@interpretpipe
-	SET interpretpipestring, #<arg0>
-	SET ipreadpoint, 0
-@interpretpipeloop
-		SET_SUBSTR chartest, #<ipreadpoint>, 1, #<string>
-		STRCMP #<chartest>, "|"
-		IF= @interpretpipefound
-		ADD ipreadpoint, 1
-		GOTO @interpretpipeloop
-@interpretpipefound
-	SUB ipreadpoint, 1
-	SET_SUBSTR string, 0, #<ipreadpoint>, #<interpretpipestring>
-	CALL @splitcommand #<string>
-	STRSTR "-#<arg0>-" "-find-sort-arrayadd-arrayrem-arraysub-give-take-host_give-host_take-party_give-party_take-add-f_add-div-f_div-mod-f_mod-mul-f_mul-sub-f_sub-and-nand-nor-not-or-xnor-xor-view-set-set_len-"
-	IF> @interpretpipecommand-#<arg0>
-	RETURN null
-@interpretpipesecond
-	ADD ipreadpoint, 3
-	SET_LEN stringlen, #<string>
-	SUB stringlen, #<ipreadpoint>
-	SET_SUBSTR string, #<ipreadpoint>, #<stringlen>, #<interpretpipestring>
-	STRSTR " | ", #<string>
-	IF<= @interpretpipethird
-;Add command to further split piped string.
-	CALL @splitcommand #<string>
-	STRSTR "-#<arg0>-" "-find-sort-arrayadd-arraycat-arraycopy-arrayrem-arraysub-give-take-host_give-host_take-party_give-party_take-add-f_add-div-f_div-mod-f_mod-mul-f_mul-sub-f_sub-and-nand-nor-not-or-xnor-xor-view-set-set_len-"
-	IF> @interpretpipe2command-#<arg0>
-	RETURN null
-@interpretpipethird
-	CALL @splitcommand #<string>
-	STRSTR "-#<arg0>-" "-find-sort-arrayadd-arraycat-arraycopy-arrayrem-arraysub-give-take-host_give-host_take-party_give-party_take-add-f_add-div-f_div-mod-f_mod-mul-f_mul-sub-f_sub-and-nand-nor-not-or-xnor-xor-view-set-set_len-"
-	IF> @interpretpipe3command-#<arg0>
-	RETURN null
-
-@interpretpipecommand-arrayadd
-	CALL @arrayadd terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-@interpretpipe2command-arrayadd
-	CALL @arrayadd terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-@interpretpipe3command-arrayadd
-	CALL @arrayadd terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-
-@interpretpipecommand-arraycat
-	CALL @arraycat terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-@interpretpipe2command-arraycat
-	CALL @arraycat terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-@interpretpipe3command-arraycat
-	CALL @arraycat terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-
-@interpretpipecommand-arraycopy
-	CALL @arraycopy terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-@interpretpipe2command-arraycopy
-	CALL @arraycopy terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-@interpretpipe3command-arraycopy
-	CALL @arraycopy terminalresult, #<arg1>
-	GOTO @interpretpipesecond
-
-@interpretpipecommand-arraysub
-	CALL @arraysub terminalresult, #<arg1>, #<arg2>, terminalresult
-	GOTO @interpretpipesecond
-@interpretpipe2command-arraysub
-	CALL @arraysub terminalresult, #<arg1>, #<arg2>, terminalresult
-	GOTO @interpretpipesecond
-@interpretpipe3command-arraysub
-	CALL @arraysub terminalresult, #<arg1>, #<arg2>, terminalresult
-	GOTO @interpretpipesecond
-
-@interpretpipecommand-find
-	CALL @find #<arg1>, #<arg2>
-	STRCMP #<arg0>, "null"
-	IF!= @interpretpipesecond
-	N: Error: command 'find' returned null!
-	RETURN null
-@interpretpipe2command-find
-	CALL @find2 #<arg1>, #<arg2>
-	STRCMP #<arg0>, "null"
-	IF!= @interpretpipesecond
-	N: Error: command 'find' returned null!
-	RETURN null
-@interpretpipe3command-find
-	CALL @find2 #<arg1>, #<arg2>
-	STRCMP #<arg0>, "null"
-	IF!= @interpretpipefinish
-	N: Error: command 'find' returned null!
-	RETURN null
-
-@interpretpipe2command-sort
-	STRSTR :, #<arg1>
-	IF> @interpretpipe2command-sortsplit
-	SET_LEN arglen, #<arg1>
-	COMPARE #<arglen>, 1
-	IF> @interpretpipe2command-sortlong
-	CALL @sort terminalresult, terminalresult, #<arg1>, name, #<arg2>
-	STRCMP #<arg0>, "null"
-	IF!= @interpretpipesecond
-@interpretpipe2command-sortlong
-	CALL @sort terminalresult, terminalresult, ism, #<arg1>, #<arg2>
-	STRCMP #<arg0>, "null"
-	IF!= @interpretpipesecond
-@interpretpipe2command-sortsplit
-	SET_LEN arglen, #<arg1>
-	SUB arglen, 2
-	SET_SUBSTR type, 0, 1, #<arg1>
-	SET_SUBSTR criteria, 2, #<arglen>, #<arg1>
-	CALL @sort terminalresult, terminalresult, #<type>, #criteria>, #<arg2>
-	STRCMP #<arg0>, "null"
-	IF!= @interpretpipesecond
-
-
-@find
-	SET resultnum, 0
-	COMPARE #<numArgs>, 1
-	IF> @findcriteria
-
-	SET findname, #<arg0>
-	CALL @findobject i, name, #<findname>, terminalresult
-	CALL @findobject s, name, #<findname>, terminalresult
-	CALL @findobject m, name, #<findname>, terminalresult
-	RETURN #<arg0>
-
-@findcriteria
-	STRSTR ":", "#<arg0>"
-	IF> @findsplitcriteria
-	SET_LEN stringlen, #<arg0>
-	COMPARE #<stringlen>, 1
-	IF!= @findnametype
-	SET findtype, #<arg0>
-	SET findvalue, #<arg1>
-	CALL @findobject i, #<findtype>, #<findvalue>, terminalresult
-	CALL @findobject s, #<findtype>, #<findvalue>, terminalresult
-	CALL @findobject m, #<findtype>, #<findvalue>, terminalresult
-	RETURN #<arg0>
-
-@findnametype
-	CALL @findobject #<arg0>, name, #<arg1>, terminalresult
-	RETURN #<arg0>
-
-@findsplitcriteria
-	SET_SUBSTR findtype, 0, 1, #<arg0>
-	SET_LEN criterialen, #<arg0>
-	SUB criterialen, 2
-	SET_SUBSTR criteria, 2, #<criterialen>, #<arg0>
-	CALL @findobject #<findtype>, #<criteria>, #<arg1>, terminalresult
-	RETURN #<arg0>
-
-
-@find2
-	SET resultnum, 0
-	COMPARE #<numArgs>, 1
-	IF> @find2criteria
-
-	SET findname, #<arg0>
-	CALL @findarray terminalresult, terminalresult, #<findname>, i, name
-	CALL @findarray terminalresult, terminalresult, #<findname>, s, name
-	CALL @findarray terminalresult, terminalresult, #<findname>, m, name
-	RETURN #<arg0>
-
-@find2criteria
-	STRSTR ":", "#<arg0>"
-	IF> @find2splitcriteria
-	SET_LEN stringlen, #<arg0>
-	COMPARE #<stringlen>, 1
-	IF!= @find2nametype
-	SET findtype, #<arg0>
-	SET findvalue, #<arg1>
-	CALL @findarray terminalresult, terminalresult, #<findvalue>, i, #<findtype>
-	CALL @findarray terminalresult, terminalresult, #<findvalue>, s, #<findtype>
-	CALL @findarray terminalresult, terminalresult, #<findvalue>, m, #<findtype>
-	RETURN #<arg0>
-
-@find2nametype
-	CALL @findarray terminalresult, terminalresult, #<arg1>, #<arg0>, name
-	RETURN #<arg0>
-
-@find2splitcriteria
-	SET_SUBSTR findtype, 0, 1, #<arg0>
-	SET_LEN criterialen, #<arg0>
-	SUB criterialen, 2
-	SET_SUBSTR criteria, 2, #<criterialen>, #<arg0>
-	CALL @findarray terminalresult, terminalresult, #<arg1>, #<findtype>, #<criteria>
-	RETURN #<arg0>
-
-
-@findobject ; CALL findobject type, criteria, searchterm, resultarray
-	SET num.devTableId, 89
-	SET str.devTableRowId, #<arg0>
-	SET objectmax, terminal.find.max#<str.devTableCOL1>
-	SET object, #<str.devTableCOL1>.id
-	SET objectcriteria, #<objecttype>.#<arg1>
-	SET objectcomp, "COMPARE"
-	SET objecttest, "<"
-	STRSTR -#<arg1>-, "-name-desc-alignment-"
-	IF> @findobjectname
-	STRSTR -#<arg1>-, "-element-class-"
-	IF> @findobjectexact
-@findobjectloop
-		ADD #<object>, 1
-		COMPARE *#<object>, *#<objectmax>
-		IF> @findobjectresults
-		#<objectcomp> *#<objectcriteria>, #<arg2>
-		IF#<objecttest> @findobject
-		ADD resultnum, 1
-		SET terminalresult-#<resultnum>, #<arg0>-*#<object>
-		GOTO @findobjectloop
-@findobjectname
-	SET objectcomp, "STRSTR"
-	SET objecttest, "<="
-	GOTO @findobjectloop
-@findobjectexact
-	SET objecttest, "!="
-	GOTO @findobjectloop
-
-@findobjectresults
-	COMPARE #<resultnum>, 1
-	IF< @findobjectnull
-	SET #<arg3>, #<resultnum>
-	RETURN #<arg3>
-	END
-@findobjectnull
-	RETURN null
-	END
-
-@findarray ; CALL @findarray resultarray, array, searchterm[, type, criteria]
-	SET index, 0
-	SET maxindex, *#<arg1>
-	SET resultnum, 0
-	COMPARE #<numArgs>, 2
-	IF> @findarrayobject
-@findarrayloop
-	ADD index, 1
-	COMPARE #<index>, #<maxindex>
-	IF> @findarrayresults
-	PUSH #<arg1>-#<index>
-	POP readarray
-	STRSTR #<readarray>, #<arg2>
-	IF<= @findarraylooop
-	ADD resultnum, 1
-	SET #<arg0>-#<resultnum>, #<readarray>
-	GOTO @findarrayloop
-@findarrayobject
-	SET findarrayobjecttest, "<"
-	SET findarrayobjectcomp, "COMPARE"
-	SET num.devTableId, 89
-	STRSTR "-name-desc-alignment-", -#<arg1>-
-	IF> @findarrayobjectname
-	STRSTR "-element-class-", -#<arg1>-
-	IF> @findarrayobjectexact
-@findarrayobjectloop
-	ADD index, 1
-	COMPARE #<index>, #<maxindex>
-	IF> @findarrayresults
-	PUSH #<arg1>-#<index>
-	POP readarray
-	SET_SUBSTR findarrayobjecttype, 0, 1, #<readarray>
-	STRCMP #<findarrayobjecttype>, #<arg3>
-	IF!= @findarrayobjectloop
-	SET_SUBSTR findarrayobjectnum, 1, 5, #<readarray>
-	SET str.devTableRowId, #<findarrayobjecttype>
-	SET findarrayobject, #<str.devTableCOL1>
-	SET findarrayobjecttype, #<findarrayobject>.id
-	SET #<findarrayobjecttype>, #<findarrayobjectnum>
-	SET findarrayobjectcriteria, #<findarrayobject>.#<arg4>
-	#<findarrayobjectcomp> *#<findarrayobjectcriteria>, #<arg2>
-	IF#<findarrayobjecttest> @findarrayobjectloop
-	ADD resultnum, 1
-	SET #<arg0>-#<resultnum>, #<readarray>
-	GOTO @findarrayobjectloop
-@findarrayobjectname
-	SET findarrayobjecttest, "<="
-	SET findarrayobjectcomp, "STRSTR"
-	GOTO @findarrayobjectloop
-@findarrayobjectexact
-	SET findarrayobjecttest, "!="
-	GOTO @findarrayobjectloop
-
-@findarrayresults
-	COMPARE #<resultnum>, 1
-	IF< @findarraynull
-	SET #<arg0>, #<resultnum>
-	RETURN #<arg0>
-	END
-@findarraynull
-	RETURN null
-	END
-
-;This sort function uses an insertion sort algorithm in-place after copying the array to the result array.
-;If the two values for resultarray and array are equal, the sort starts without copying.
-;Before starting the sort, the algorithm checks the values at the two ends.  If they would need to swap, the entire array is flipped before sorting.
-@sort ; CALL @sort resultarray, array[, type, criteria, ascend/descend]
-	SET index, 1
-	SET maxindex, *#<arg1>
-	COMPARE #<numArgs>, 2
-	IF> @sortobjects
-	CALL @arraycopy #<arg1>, #<arg0>
-	SET array, #<arg0>
-
-@sortarrayloop
-	ADD index, 1
-	COMPARE #<index>, #<maxindex>
-	IF> @sortarraydone
-	SET sortindex, #<index>
-@sortarraysubloop
-	SET currobject, #<array>-#<sortindex>
-	SUB sortindex, 1
-	SET compobject, #<array>-#<sortindex>
-	STRCMP *#<currobject>, *#<compobject>
-	IF>= @sortarrayloop
-	PUSH #<compobject>
-	PUSH #<currobject>
-	POP #<compobject>
-	POP #<currobject>
-	GOTO @sortarraysubloop
-
-@sortobject
-	SET type, #<arg2>
-	SET criteria, #<arg3>
-	SET sortobjectcomp, "COMPARE"
-	STRCMP #<arg4>, "a"
-	IF= @sortobjectascend
-	SET sortobjecttest, "<="
-	GOTO @sortobjectascendafter
-@sortobjectascend
-	SET sortobjecttest, ">="
-@sortobjectascendafter
-	STRSTR -#<arg3>-, "-name-desc-alignment-"
-	IF> @sortobjectname
-@sortobjectcompback
-	CALL @arraycopy #<arg1>, #<arg0>
-	SET array, #<arg0>
-
-@sortobjectloop
-	ADD index, 1
-	COMPARE #<index>, #<maxindex>
-	IF> @sortarraydone
-	SET sortindex, #<index>
-@sortobjectsubloop
-	PUSH #<array>-#<sortindex>
-	POP currreadarray
-	SET_SUBSTR sortobjecttype, 0, 1, #<currreadarray>
-	STRSTR #<sortobjecttype>, #<type>
-	IF<= @sortobjectrem
-	SET_SUBSTR sortobjectnum, 1, 5, #<currreadarray>
-	SET str.devTableRowId, #<sortobjecttype>
-	SET sortobject, #<str.devTableCOL1>
-	SET sortobjecttype, #<sortobject>.id
-	SET #<sortobjecttype>, #<sortobjectnum>
-	SET currobject, #<sortobject>.#<arg4>
-	SUB sortindex, 1
-	PUSH #<array>-#<sortindex>
-	POP compreadarray
-	SET_SUBSTR sortobjecttype, 0, 1, #<compreadarray>
-	STRSTR #<sortobjecttype>, #<type>
-	IF<= @sortobjectrem
-	SET_SUBSTR sortobjectnum, 1, 5, #<compreadarray>
-	SET str.devTableRowId, #<sortobjecttype>
-	SET sortobject, #<str.devTableCOL1>
-	SET sortobjecttype, #<sortobject>.id
-	SET #<sortobjecttype>, #<sortobjectnum>
-	SET compobject, #<sortobject>.#<arg4>
-	#<sortobjectcomp> *#<currobject>, *#<combobject>
-	IF#<sortobjecttest> @sortobjectloop
-	PUSH #<compreadarray>
-	PUSH #<currreadarray>
-	POP #<compreadarray>
-	POP #<currreadarray>
-	GOTO @sortobjectsubloop
-
-@sortobjectname
-	SET sortobjectcomp, "STRCMP"
-	GOTO @sortobjectcompback
-@sortdone
-	RETURN #<array>
+;@terminalfind type, attribute, value; RETURN matchIDarray, attributeArray
+@terminalfind
+	PUSH typeid
+	PUSH attribute
+	PUSH findmax
+	PUSH shortname
+	PUSH subtype
+	PUSH subcheck
+	PUSH spell
+	PUSH monster
+	PUSH item
+	SET spell, 767
+	SET monster, 4095
+	SET item, 5119
+	SET subtype, -1
+	STRSTR #<arg0>, ":"
+	IF= @terminalfindsubtypedone
+	NTH_TOKEN subtype, 1, #<arg0>, ":"
+	NTH_TOKEN arg0, 0, #<arg0>, ":"
+@terminalfindsubtypedone
+	SET findmax, *#<arg0>
+	SET_SUBSTR shortname, 0, 1, #<arg0>
+	SET typeid, "#<arg0>.id"
+	SET attribute, "#<arg0>.#<arg1>"
+	SET #<typeid>, 0
+	SET terminalfindresults, 0
+	SET terminalfindattributes, 0
+	COMPARE #<subtype>, 0
+	IF>= @terminalfindsubtype
+	STRSTR "-name-desc-alignment-skin-class-element-" -#<arg1>-
+	IF> @terminalfindexactloop
+@terminalfindloop
+		COMPARE *#<typeid>, #<findmax>
+		IF>= @terminalfindloopdone
+		ADD #<typeid>, 1
+		COMPARE *#<attribute>, #<arg2>
+		IF< @terminalfindloop
+		ADD terminalfindresults, 1
+		ADD terminalfindattributes, 1
+		SET terminalfindresults-#<terminalfindresults>, #<shortname>*#<typeid>
+		SET terminalfindattributes-#<terminalfindattributes>, *#<attribute>
+		GOTO @terminalfindloop
+@terminalfindsubtype
+	SET spell, "element"
+	SET monster, "element"
+	SET item, "class"
+	SET subcheck, #<arg0>.*<arg0>
+	STRSTR "-name-desc-alignment-skin-class-element-" -#<arg1>-
+	IF> @terminalfindexactloopsubtype
+@terminalfindloopsubytpe
+		COMPARE *#<typeid>, #<findmax>
+		IF>= @terminalfindloopdone
+		ADD #<typeid>, 1
+		COMPARE *#<subcheck>, #<subtype>
+		IF!= @terminalfindloopsubtype
+		COMPARE *#<attribute>, #<arg2>
+		IF< @terminalfindloopsubtype
+		ADD terminalfindresults, 1
+		ADD terminalfindattributes, 1
+		SET terminalfindresults-#<terminalfindresults>, #<shortname>*#<typeid>
+		SET terminalfindattributes-#<terminalfindattributes>, *#<attribute>
+		GOTO @terminalfindloopsubtype
+@terminalfindexactloop
+		COMPARE *#<typeid>, #<findmax>
+		IF>= @terminalfindloopdone
+		ADD #<typeid>, 1
+		STRCMP *#<attribute>, #<arg2>
+		IF!= @terminalfindexactloop
+		ADD terminalfindresults, 1
+		SET terminalfindresults-#<terminalfindresults>, #<shortname>*#<typeid>
+		GOTO @terminalfindexactloop
+@terminalfindexactloopsubtype
+		COMPARE *#<typeid>, #<findmax>
+		IF>= @terminalfindloopdone
+		ADD #<typeid>, 1
+		COMPARE *#<subcheck>, #<subtype>
+		IF!= @terminalfindexactloopsubtype
+		STRCMP *#<attribute>, #<arg2>
+		IF!= @terminalfindexactloopsubtype
+		ADD terminalfindresults, 1
+		SET terminalfindresults-#<terminalfindresults>, #<shortname>*#<typeid>
+		GOTO @terminalfindexactloopsubtype
+@terminalfindloopdone
+	POP item
+	POP monster
+	POP spell
+	POP subcheck
+	POP subtype
+	POP shortname
+	POP findmax
+	POP attribute
+	POP typeid
+	RETURN terminalfindresults, terminalfindattributes
 
 ;end of terminalfunctions
 @terminalafter
