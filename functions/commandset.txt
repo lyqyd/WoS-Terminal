@@ -1,14 +1,14 @@
 
-;default command set 1.4
+;default command set 1.5
 
 	SET dependencycheck, 0
-	CALL @checkversion string, 1.4
+	CALL @checkversion string, 1.3
 	ADD dependencycheck, #<arg0>
 	COMPARE #<dependencycheck>, 1
 	IF< @defaultcommandafter
 	ADD functionlist, 1
 	SET functionlist-name-#<functionlist>, "defaultcommand"
-	SET functionlist-version-#<functionlist>, "1.3"
+	SET functionlist-version-#<functionlist>, "1.5"
 	GOTO @defaultcommandafter
 
 @splitcommand
@@ -34,7 +34,7 @@
 	IF= @command-at
 	SET_SUBSTR comstrtest, 0, 1, #<commandstring>
 	STRCMP #<comstrtest>, "@"
-	IF= @command-at
+	IF= @command-short-at
 	RETURN null
 	END
 @command-b
@@ -320,6 +320,13 @@
 	RETURN #<comstrtest>, #<string>
 	END
 
+@command-short-at
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "1"
+	SET_SUBSTR string, 1, #<stringlen>, #<commandstring>
+	RETURN #<comstrtest>, #<string>
+	END
+
 @command-bkgnd
 @command-color
 @command-eject
@@ -404,6 +411,20 @@
 	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
 	CALL @separateCommas #<string>
 	RETURN #<comstrtest>, #<arg0>, #<arg1>
+	END
+
+@command-find
+	SET_LEN stringlen, #<commandstring>
+	SUB stringlen, "5"
+	IF<= @command-find-interactive
+	STRSTR #<commandstring>, ","
+	IF= @command-find-interactive
+	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
+	CALL @separateCommas #<string>
+	RETURN #<comstrtest>, #<arg0>, #<arg1>, #<arg2>
+	END
+@command-find-interactive
+	RETURN find, interactive
 	END
 
 @command-game
@@ -525,18 +546,17 @@
 	RETURN #<comstrtest>, #<string>
 	END
 	
-@command-find
 @command-sort
 	SET_LEN stringlen, #<commandstring>
 	SUB stringlen, "5"
 	SET_SUBSTR string, 5, #<stringlen>, #<commandstring>
 	SET comma, ","
 	STRSTR #<string>, #<comma>
-	IF= @command-fiso-nocomma
+	IF= @command-sort-nocomma
 	CALL @separateCommas #<string>
 	RETURN #<comstrtest>, #<arg0>, #<arg1>
 	END
-@command-fiso-nocomma
+@command-sort-nocomma
 	RETURN #<comstrtest>, #<string>
 	END
 
@@ -552,22 +572,7 @@
 	RETURN
 	END
 
-@ExCommandadd
-@ExCommandand
-@ExCommanddiv
 @ExCommandface
-@ExCommandf_add
-@ExCommandf_div
-@ExCommandf_mod
-@ExCommandf_mul
-@ExCommandf_sub
-@ExCommandmod
-@ExCommandmul
-@ExCommandor
-@ExCommandset
-@ExCommandset_len
-@ExCommandsub
-@ExCommandxor
 	#<arg0> #<arg1>, "#<arg2>"
 	RETURN
 	END
@@ -617,19 +622,46 @@
 	RETURN
 	END
 
+@ExCommandadd
+@ExCommandand
 @ExCommandcompare
+@ExCommanddiv
+@ExCommandf_add
 @ExCommandf_compare
+@ExCommandf_div
+@ExCommandf_mod
+@ExCommandf_mul
+@ExCommandf_sub
+@ExCommandmod
+@ExCommandmul
+@ExCommandor
+@ExCommandset
+@ExCommandset_len
 @ExCommandstrcmp
 @ExCommandstrstr
+@ExCommandsub
+@ExCommandxor
+	PUSH #<arg1>
 	#<arg0> #<arg1>, "#<arg2>"
-	IF= @ExCommandEq1	;Work on equality stuff!
+	IF= @ExCommandEq1
 @ExCommandcompEq
+	POP #<arg1>
+	PUSH #<arg1>
+	#<arg0> #<arg1>, "#<arg2>"
 	IF> @ExCommandEq2
 @ExCommandcompGt
+	POP #<arg1>
+	PUSH #<arg1>
+	#<arg0> #<arg1>, "#<arg2>"
 	IF< @ExCommandEq4
 @ExCommandcompLt
+	POP #<arg1>
+	PUSH #<arg1>
+	#<arg0> #<arg1>, "#<arg2>"
 	IFEVEN @ExCommandEq8
 @ExCommandcompEven
+	POP #<arg1>
+	#<arg0> #<arg1>, "#<arg2>"
 	IFODD @ExCommandEq16
 @ExCommandcompOdd
 	RETURN
@@ -650,6 +682,11 @@
 @ExCommandoffer
 @ExCommandoffer2
 	#<arg0> #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
+	RETURN
+	END
+
+@ExCommandfind
+	CALL 2240@terminalfind #<arg1>, #<arg2>, #<arg3>
 	RETURN
 	END
 
@@ -757,12 +794,12 @@
 @ExCommandiftrue
 	CALL @splitcommand #<arg1>
 	STRCMP #<arg0>, "null"
-	IF= @ExCommandiftruego
+	IF!= @ExCommandiftruego
 	END
 @ExCommandif2true
 	CALL @splitcommand #<arg2>
 	STRCMP #<arg0>, "null"
-	IF= @ExCommandiftruego
+	IF!= @ExCommandiftruego
 	END
 @ExCommandiftruego
 	CALL @ExCommand#<arg0> #<arg0>, #<arg1>, #<arg2>, #<arg3>, #<arg4>, #<arg5>, #<arg6>, #<arg7>, #<arg8>, #<arg9>
@@ -774,13 +811,13 @@
 	END
 
 @ExCommandnand
-	AND #<arg1>, "#<arg2>"
+	AND #<arg1>, #<arg2>
 	NOT #<arg1>
 	RETURN
 	END
 
 @ExCommandnor
-	OR #<arg1>, "#<arg2>"
+	OR #<arg1>, #<arg2>
 	NOT #<arg1>
 	RETURN
 	END
@@ -805,7 +842,7 @@
 	END
 
 @ExCommandxnor
-	XOR #<arg1>, "#<arg2>"
+	XOR #<arg1>, #<arg2>
 	NOT #<arg1>
 	RETURN
 	END
